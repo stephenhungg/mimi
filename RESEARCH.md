@@ -286,3 +286,108 @@ All three live in **one Worker project** — no [[triggers]] block needed, just 
 - Workers is **free through August 2026** on Business/Enterprise — no plan-gating risk for the demo.
 - Per the changelog: PATs (May 12), markdown insert positions (May 15), meeting notes query (May 11), agent_id parent types (May 11). Fresh primitives — using `agent_id` parents and meeting notes queries could feel cutting-edge to judges.
 
+
+---
+
+## Round 3 — Cracked Notion Integrations
+
+Deep dive into the non-obvious surfaces of the May 13 2026 platform. Goal: find the angles that will land with simon last, max schoening, anthony morris. Every pattern below is rated 1-5 on `JUDGE-IMPRESS / BUILD-COST / DEMO-VISIBILITY`. Lower build-cost is better.
+
+### Confirmed primitives (the building blocks)
+
+- **`worker.tool(key, { schema, outputSchema, execute, hints })`** — registered tools appear in *any* Notion Custom Agent's tool list. Schema is the `j` (zod-like) builder. `readOnlyHint: true` allows auto-execute without user confirm. Test locally via `ntn workers exec <tool> --local -d '{...}'`.
+- **`worker.webhook(...)`** — handler gets `{ deliveryId, body, rawBody, headers, method }`. Retries 3x on error, never on `WebhookVerificationError`. Notion-native webhook events also fan into the same handler surface.
+- **`worker.sync({ schedule: "5m"|"15m"|"1h"|"1d"|"manual"|"continuous", mode: "replace"|"incremental" })`** — state read/write between runs via `nextState`. Min interval 5m, max 7d. `"continuous"` is the cracked one — keeps running.
+- **`worker.oauth(...)`** — full 3-legged OAuth with auto-refresh, works for github/google/anything. `await provider.accessToken()` from inside any tool/sync/webhook.
+- **`worker.pacer()`** — distributes API budget across windows; `await pacer.wait()` from anywhere.
+- **`worker.database(...)`** — declares a managed db, auto-migrates schema on deploy. Synced properties are LOCKED in the UI (huge for canonical-state design).
+- **Comment `display_name: { type: "custom", custom: { name: "Mimi-Pip" } }`** — a single worker can post comments under *arbitrary* names per-comment. This is the chibi-talks-in-notion primitive.
+- **`agent_id` parent type** (shipped 2026-05-11) — pages/blocks parented to an agent. Currently scoped to "agent instruction pages," but the type exists and serializes cleanly.
+- **`POST /v1/blocks/meeting_notes/query`** (shipped 2026-05-11) — filter by attendees/title/created_time, returns transcript + summary + notes block IDs. **No webhook yet** — must poll, but `last_edited_time desc + limit 1` makes this a 5-line near-realtime feed.
+- **Webhook taxonomy includes:** `comment.created/updated/deleted`, `file_upload.completed/created/expired/failed`, `view.created/updated/deleted`, `page.transcription.block_transcript_deleted` (implies there's also a created variant), `page.content_updated`, `data_source.content_updated`, `data_source.schema_updated`.
+- **Markdown `insert_content.position`** (shipped 2026-05-15) — prepend OR append to a page without rewriting it. This is the streaming-into-notion primitive.
+
+### What's a hard NO (we ruled out)
+
+- **No "external agent registration" API yet.** External Agents API is private-beta waitlist. We cannot make mimi appear in someone's agent list without going through partnership flow. (Workaround: ship as a Custom Agent backed by our workers.)
+- **No A2A comment subscription.** `comment.created` payload's `created_by` is just a partial user — no agent/bot flag. Workers CAN react to all new comments, but filtering "comments made by agent X" requires checking `display_name.resolved_name` or stashing comment IDs we created.
+- **No build-your-own-MCP-server-for-notion.** Notion's MCP is a hosted endpoint at `mcp.notion.com/mcp`. The `notion-mcp-server` OSS is unmaintained. mimi cannot register itself as an MCP server that notion AI talks to.
+- **No streaming tool output.** Tools return JSON or string. Nothing fancier.
+
+### THE CRACKED PATTERNS (ranked)
+
+#### 1. Chibi-as-Display-Name comment puppetry  **JUDGE:5 / COST:1 / DEMO:5**
+Every chibi in the room posts to the same canonical notion page (or per-agent journal) using `display_name.type: "custom"` with the chibi's name. Demo: a human comments on a notion page → webhook fires → mimi-world-events posts a reply *as the chibi "Pip"* in notion AND broadcasts to the 3D room. Same character, two surfaces. **This is the wow moment.** Simon will recognize it instantly because the custom display_name field is brand new and underused — most integrations still post as "[Integration] my-app".
+
+#### 2. Worker-as-canonical-state with locked synced properties  **JUDGE:4 / COST:2 / DEMO:3**
+mimi-world-events declares a managed db (`world_events`) via `worker.database()`. Properties that the 3D room owns (chibi position, last action, current emotion) are sync-written → users SEE them in notion but **cannot edit them in the Notion UI**. This is gold because it makes "notion is canonical state" defensible — judges will ask "what stops a user from editing the db and breaking the room?" Answer: the platform itself.
+
+#### 3. Continuous sync as the agent heartbeat  **JUDGE:4 / COST:1 / DEMO:4**
+mimi-overnight-pulse uses `schedule: "continuous"` mode instead of cron. The sync returns `hasMore: true` to keep the runtime alive in a tight loop. Each iteration: query meeting notes / page edits / db changes since last cursor, emit chibi reactions. Effectively: a server-side daemon that does NOT need us to run any infra. **Notion pays the compute, we ship the brain.** Anthony will appreciate the "the platform pays for the always-on agent loop" pattern.
+
+#### 4. Meeting-notes-to-chibi narration  **JUDGE:5 / COST:2 / DEMO:5**
+A sync polls `/v1/blocks/meeting_notes/query` every 5 min with `sort: [created_time desc], limit: 1`. New meeting → fetch the transcript block → a chibi in the room walks to the whiteboard and *summarizes the meeting aloud via animalese* with the actual summary as caption text. Pulls the brand-new May 11 endpoint, which nobody at the hackathon will use because it's not in tutorials yet. This is the "oh shit they read the changelog from 5 days ago" moment.
+
+#### 5. File-upload-completed → chibi vision  **JUDGE:5 / COST:2 / DEMO:5**
+Webhook on `file_upload.completed` → worker pulls the file → if image, sends to claude vision → chibi walks over to a virtual "photo wall" in the room, holds up the image, "comments" on it (animalese + caption) → posts the description back as a notion comment on the page. Human drops a screenshot into notion, chibi picks it up in the 3D world and reacts. **Cross-surface continuity is the whole pitch.**
+
+#### 6. Agent-tools as the inter-worker bus (workers calling workers via custom agent)  **JUDGE:4 / COST:2 / DEMO:3**
+Notion doesn't give us native worker-to-worker pub/sub. But: mimi-agent-tools registers tools like `get_room_state`, `nudge_chibi(name, action)`, `query_trust_ledger(agent_id)`. Any Custom Agent in the workspace (including ones invoked by mimi-overnight-pulse via the comment+@mention pattern) can call these tools. The trick: mimi-github-bridge receives a github event, posts a notion comment "@mimi-coordinator please nudge Pip to celebrate" — the custom agent reads the mention, calls `nudge_chibi` — chibi reacts. **Custom agents become the message bus, with workers as the actual implementation.** This is the agent-orchestration story max schoening will care about.
+
+#### 7. The agent journal pattern (agent_id parent + per-agent page)  **JUDGE:3 / COST:1 / DEMO:3**
+Each chibi has a notion page parented to its agent identity. After every action, the chibi's worker handler appends a markdown line via `update-page-markdown` with `insert_content.position: "end"`. **No rewrite, just append.** Agents have actual journals. Demo: open a chibi's notion page, watch lines stream in live as the chibi acts in the 3D room. Bonus: agents can read their OWN journals to maintain continuity across sessions ("yesterday I helped stephen ship X, today I'll check on it"). Uses the May 15 markdown-position feature nobody else has touched.
+
+#### 8. Trust ledger as a queryable agent tool  **JUDGE:3 / COST:1 / DEMO:2**
+mimi-agent-tools exposes `query_trust_score(agent_name)`. Backed by a managed db. Other agents (notion custom agents, external claude code sessions via MCP, etc) can call it. **mimi becomes a piece of infrastructure other agents depend on**, not just a demo. Bonus framing: "your AI agents shouldn't trust each other blindly — query mimi first."
+
+#### 9. View-created webhook → reactive 3D layout  **JUDGE:3 / COST:3 / DEMO:4**
+Human creates a kanban view in notion → `view.created` webhook → worker pushes the view config to the room → the 3D world rearranges its furniture / whiteboard layout to match the new view's columns. Notion becomes the level editor for the room. Cool but build cost is real (need a layout engine in the client).
+
+#### 10. Today's-brief auto-page at 7am  **JUDGE:2 / COST:1 / DEMO:2**
+Sync at `"1h"` cadence, at 7am local: query all changed pages + new comments + new meeting notes since 24h ago, generate a "Today's Brief" page via markdown-append. Useful but generic — every hackathon has one. Use only as filler if we have time.
+
+#### 11. (Spicy unhinged) Cursor backed by mimi  **JUDGE:5 / COST:4 / DEMO:3**
+The cursor→notion-custom-agent connect guide reveals the integration is via "User API Key" pasted into notion. We *could* register mimi as a custom agent the same way and let cursor route work through it — every notion-task that cursor picks up gets mirrored as a chibi "working" in the room. Build cost is the unknown (we don't fully know the wire). If we can crack this in 4 hours, it's a category-defining demo: "cursor doesn't just edit your code, it teleports a chibi to your office to do the work alongside you."
+
+### Build priority for the next ~30 hours
+
+**Must-ship (Sat morning):**
+1. Chibi-as-display-name comments (#1)
+2. Locked synced properties in world_events db (#2)
+3. file_upload → chibi vision (#5)
+
+**Stretch (Sat afternoon / Sun morning):**
+4. Meeting-notes-to-chibi narration (#4)
+5. Continuous-sync heartbeat (#3)
+6. Agent journal pattern (#7)
+7. Custom-agent as message bus (#6)
+
+**Demo polish:**
+8. Trust ledger tool callable from claude code session in the demo video (#8)
+
+### Why this lands with these specific judges
+
+- **simon last** — knows every edge case; will instantly clock that we used `display_name.custom`, `meeting_notes/query`, `insert_content.position`, and `agent_id` parents. Four brand-new surfaces in one demo.
+- **max schoening** — head of product; will care about workers-as-orchestration-bus, locked synced properties (a product-thinking move), and the agent-journal pattern as a *new* primitive notion didn't ship explicitly.
+- **anthony morris** — claude code MTS; the "platform pays for the heartbeat" continuous-sync angle + cursor-backed-by-mimi is his world.
+- **andrew qu (vercel)** — will dig the workers-as-edge-compute story; everything we ship is hosted by notion, zero vercel needed (this is a feature, not a bug for them).
+- **mike vernal** — pattern guy; the multi-surface continuity (3D chibi reacts to notion comment AND posts back as same character) is a "wait, this is a new category" moment.
+
+### Sources
+
+- https://developers.notion.com/llms.txt (full doc index)
+- https://developers.notion.com/workers/guides/tools.md
+- https://developers.notion.com/workers/guides/webhooks.md
+- https://developers.notion.com/workers/guides/syncs.md
+- https://developers.notion.com/workers/guides/oauth.md
+- https://developers.notion.com/workers/reference/sdk.md
+- https://developers.notion.com/reference/query-meeting-notes.md
+- https://developers.notion.com/reference/parent-object.md
+- https://developers.notion.com/reference/comment-display-name.md
+- https://developers.notion.com/reference/create-a-comment.md
+- https://developers.notion.com/reference/webhooks.md
+- https://developers.notion.com/page/changelog.md
+- https://www.notion.com/blog/introducing-developer-platform
+- https://techcrunch.com/2026/05/13/notion-just-turned-its-workspace-into-a-hub-for-ai-agents/
+- https://dev.to/devteam/congrats-to-the-notion-mcp-challenge-winners-28ab
+- https://matthiasfrank.de/en/notion-workers-dev-day-2026/

@@ -8,7 +8,7 @@ A cozy first-person 3D room where humans and chibi agents live together, talk vi
 
 **Camera locked**: FIRST PERSON. You see through your chibi's eyes. Turn your head, see your agent at the desk looking at you. Turn around, see a teammate's chibi at the door. Immersion over spectator-view. Less "video game," more "i'm in a room with my coworkers."
 
-**Communication locked**: voice (livekit) + text (in-room chat input, always visible). Type to your agent, she answers in animalese + text bubble. Both modalities valid. Text is the work, voice is the vibe.
+**Communication locked**: voice (livekit) + text (in-room chat input, always visible). Type to your agent, it answers in animalese + text bubble. Both modalities valid. Text is the work, voice is the vibe.
 
 **Autonomy locked**: agents are CONSTANTLY watching external sources via workers (github webhooks priority, gmail/linear/calendar as vision-slide expansion). When events fire, the broadcast pattern: event → mimi-world-events worker → fans out to all subscribed agents → agents in the room jolt visibly and negotiate who handles it via animalese/text in <2 lines → one agent acts, decision logs to notion. The room is alive because the outside world is alive.
 
@@ -17,6 +17,10 @@ A cozy first-person 3D room where humans and chibi agents live together, talk vi
 **Shared agent memory locked**: each agent maintains a notion page at `mimi.memory/<agent_id>` — auto-journaled, date-headed sections with bullet points, written by the agent herself after every meaningful event. CRITICAL: every agent can READ every other agent's memory page via `mimi.query_memory(agent_id)`. Agent context is not real-time chatter only — they deep-history each other. Judges scroll the memory pages in demo, see agents' actual thoughts laid out in notion. Statefulness rubric pegged.
 
 **Overnight briefing locked**: `mimi-overnight-pulse` worker drafts a fresh `today's brief` notion page each 30-min cycle using events + decisions + agent memory + meeting notes. By 7am a polished page exists. When a human logs in, the agent walks to the desk, picks up the brief (glowing artifact), reads aloud in animalese while human follows in first person. This is the demo's opening kill-shot moment.
+
+**Agent runtime split locked (hybrid)**: notion custom agents handle the workspace-native side (mention-triggered actions, meeting note queries, comment threads) — they ride notion's infra, no anthropic key, judge-scrollable in settings. Our custom harness handles the in-room experience (real-time chibi motion, animalese voice, livekit participation) — needs anthropic api directly for latency reasons. The two halves sync via notion db rows: notion agent writes a decision row → worker fires → in-room chibi reacts. Best of both: "we used notion's agent infra" flex AND full real-time control.
+
+**Pronouns**: agents are referred to as "it" — not "she" or "he" or "they." Agents have personas but no gender. Avoids the parasocial AI-girlfriend trap.
 
 **Why chibi**: avoids uncanny-VR-dystopia trap. Reads as toy/playful/team, not parasocial. Fast to render. Big design space for differentiation. Demos beautifully on video. Procedural per-user generation is the viral loop.
 
@@ -34,11 +38,11 @@ Built for the Notion Developer Platform Hackathon, May 16-17 2026.
 - **MIMI v1** taught us: the win is a shared brain where multiple agents coexist with multiple humans.
 - **Stephen's pattern**: multimodal, real-time, spatial, multi-system fan-out, kill-shot demo moment.
 
-MIMI combines all three. Each person onboards a personal agent (Angel-style — swipe / vibe / strengths / context pack). The agent gets a VRM avatar, a voice, a persona. Then she joins the multiplayer room. Other humans + their agents are there. Everyone collaborates. Every spoken word, every artifact created, every decision made — grounded in Notion via Workers.
+MIMI combines all three. Each person onboards a personal agent (Angel-style — swipe / vibe / strengths / context pack). The agent gets a VRM avatar, a voice, a persona. Then it joins the multiplayer room. Other humans + their agents are there. Everyone collaborates. Every spoken word, every artifact created, every decision made — grounded in Notion via Workers.
 
 ## The pitch (one paragraph)
 
-MIMI is a multiplayer 3D workspace built on Notion's new Developer Platform. You create a personal AI agent in five minutes — give her a name, a vibe, a context pack. She gets a body and a voice. You drop her into the Commons, where your teammates and their agents are already there. You walk around, you talk, agents collaborate, artifacts get made. Every action — every spoken word, every decision, every doc shipped — lands in Notion as ground truth. Leave the room, open Notion on your phone, the receipts are there. Come back the next morning, your agent's been there overnight, did her work, has a brief ready for you in spatial voice.
+MIMI is a multiplayer 3D workspace built on Notion's new Developer Platform. You create a personal AI agent in five minutes — give its a name, a vibe, a context pack. It gets a body and a voice. You drop its into the Commons, where your teammates and their agents are already there. You walk around, you talk, agents collaborate, artifacts get made. Every action — every spoken word, every decision, every doc shipped — lands in Notion as ground truth. Leave the room, open Notion on your phone, the receipts are there. Come back the next morning, your agent's been there overnight, did its work, has a brief ready for you in spatial voice.
 
 ## Why this wins
 
@@ -107,10 +111,10 @@ Skip the 269-card swipe — too much surface for 24h. Compressed:
 
 1. land on mimi.[stephen domain]/onboard
 2. one-page vibe picker: 4 archetypes × 2 vibes = 8 cards. pick 3 you like.
-3. quick form: name, what you're working on (1 sentence), what you want her to be good at (1 sentence)
-4. her chibi materializes — procedural mesh built from persona vector
-5. her first line of animalese plays with subtitle ("alright [name], let's get into it.")
-6. "let her in" → drops you into mimi (first person camera) — she's standing next to you
+3. quick form: name, what you're working on (1 sentence), what you want its to be good at (1 sentence)
+4. its chibi materializes — procedural mesh built from persona vector
+5. its first line of animalese plays with subtitle ("alright [name], let's get into it.")
+6. "let its in" → drops you into mimi (first person camera) — she's standing next to you
 
 ## Demo arc (3 min judging slot)
 
@@ -118,7 +122,7 @@ Skip the 269-card swipe — too much surface for 24h. Compressed:
 
 stephen (live): "agents today are tools you summon. they don't have a body. they don't live anywhere. they don't remember the room they were in. mimi is a multiplayer workspace where your personal agent has a body, a voice, and a memory grounded in notion."
 
-maddy on stage: lands on the onboarding URL. picks vibes. her agent's face fades in. her agent says one line: "alright maddy, let's get into it." → drop into commons scene.
+maddy on stage: lands on the onboarding URL. picks vibes. its agent's face fades in. its agent says one line: "alright maddy, let's get into it." → drop into commons scene.
 
 ### [0:30 – 1:30] live multiplayer beat
 
@@ -179,7 +183,7 @@ audible. unforgettable. tweet-able.
 - vite landing page at /onboard
 - 8-card vibe picker
 - generate persona vector → claude system prompt → voice id assignment
-- "let her in" → drops into commons scene
+- "let its in" → drops into commons scene
 
 ### Hours 16-20 — pre-stage + polish
 - overnight agent loop: pacing agent in the room, picking up artifacts, logging events
