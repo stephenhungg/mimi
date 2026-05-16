@@ -22,6 +22,18 @@ A cozy first-person 3D room where humans and chibi agents live together, talk vi
 
 **Pronouns**: agents are referred to as "it" — not "she" or "he" or "they." Agents have personas but no gender. Avoids the parasocial AI-girlfriend trap.
 
+**Framing language (HARD RULE)**: agents are "team agents," "workspace agents," "the codex agent," "the github agent." NEVER "personal agent," "your agent," "companion," "friend," "she," "her." The hackathon explicitly bans "ai companion chatbot" projects. We are infrastructure for mixed human-agent teams, not an AI friend in a room.
+
+**Cerebral Valley + Vercel + git hygiene**:
+1. Stephen must be REGISTERED + APPROVED on Cerebral Valley before judging starts — verify now.
+2. The onboarding page deploys to Vercel — aligns with sponsor + Andrew Qu (Vercel CTO judge). 10min task.
+3. The animalese module is rewritten FRESH inside mimi/ this weekend (NOT lifted from Angel) — 1h task. Eliminates "prior work" risk against the hackathon rule.
+4. Git history is the receipt — every commit timestamped during the event. Already clean.
+
+**The 1-minute demo video is the gating artifact**: round-1 judges may not even see the live demo if the video doesn't get us through. Block 11am-12pm Sunday for video recording. No new features after 11am Sunday.
+
+**Pitch composition**: 80% live demo (show the room, agents reacting, notion receipts), 20% voiceover. NO slides. NO thesis monologue. Just open mimi. and let it speak.
+
 **Why chibi**: avoids uncanny-VR-dystopia trap. Reads as toy/playful/team, not parasocial. Fast to render. Big design space for differentiation. Demos beautifully on video. Procedural per-user generation is the viral loop.
 
 **Voice direction locked**: agents speak in **animalese** (animal-crossing-style procedural chirp voice). Humans speak normally via livekit voice. Subtitles do the semantic heavy lifting — chunky cartoon font, char-by-char reveal at ~30ms, single animalese sample per char. Per-agent sample bank mapped from persona vector (6 clusters: cheerful / sleepy / sassy / earnest / dry / warm).
