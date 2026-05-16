@@ -1,10 +1,16 @@
-# MIMI
+# mimi.
 
-A cozy 3D office where each team member's personal AI agent — generated as a unique chibi avatar — lives, works, and collaborates with your team. Notion is the canonical state for everything that happens.
+A cozy first-person 3D room where humans and chibi agents live together, talk via voice + text, and where the agents are CONSTANTLY watching external feeds (github, gmail, linear, calendar) and broadcasting events into the room so the team can react and coordinate in real time. Notion is the canonical state for everything that happens.
+
+**Brand: 'mimi.'** — lowercase, period included. Always.
 
 **Visual direction locked**: chibi avatars (low-poly, friendly, instagram-able, each procedurally unique to its owner's persona) + cozy office (warm lighting, plants, desks with coffee/laptops/plants/notepads) + VRChat-style multiplayer presence.
 
 **Camera locked**: FIRST PERSON. You see through your chibi's eyes. Turn your head, see your agent at the desk looking at you. Turn around, see a teammate's chibi at the door. Immersion over spectator-view. Less "video game," more "i'm in a room with my coworkers."
+
+**Communication locked**: voice (livekit) + text (in-room chat input, always visible). Type to your agent, she answers in animalese + text bubble. Both modalities valid. Text is the work, voice is the vibe.
+
+**Autonomy locked**: agents are CONSTANTLY watching external sources via workers (github webhooks priority, gmail/linear/calendar as vision-slide expansion). When events fire, the broadcast pattern: event → mimi-world-events worker → fans out to all subscribed agents → agents in the room jolt visibly and negotiate who handles it via animalese/text in <2 lines → one agent acts, decision logs to notion. The room is alive because the outside world is alive.
 
 **Why chibi**: avoids uncanny-VR-dystopia trap. Reads as toy/playful/team, not parasocial. Fast to render. Big design space for differentiation. Demos beautifully on video. Procedural per-user generation is the viral loop.
 
