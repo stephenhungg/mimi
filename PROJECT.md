@@ -1,8 +1,10 @@
-# THE COMMONS
+# MIMI
 
 A cozy 3D office where each team member's personal AI agent — generated as a unique chibi avatar — lives, works, and collaborates with your team. Notion is the canonical state for everything that happens.
 
 **Visual direction locked**: chibi avatars (low-poly, friendly, instagram-able, each procedurally unique to its owner's persona) + cozy office (warm lighting, plants, desks with coffee/laptops/plants/notepads) + VRChat-style multiplayer presence.
+
+**Camera locked**: FIRST PERSON. You see through your chibi's eyes. Turn your head, see your agent at the desk looking at you. Turn around, see a teammate's chibi at the door. Immersion over spectator-view. Less "video game," more "i'm in a room with my coworkers."
 
 **Why chibi**: avoids uncanny-VR-dystopia trap. Reads as toy/playful/team, not parasocial. Fast to render. Big design space for differentiation. Demos beautifully on video. Procedural per-user generation is the viral loop.
 
@@ -20,11 +22,11 @@ Built for the Notion Developer Platform Hackathon, May 16-17 2026.
 - **MIMI v1** taught us: the win is a shared brain where multiple agents coexist with multiple humans.
 - **Stephen's pattern**: multimodal, real-time, spatial, multi-system fan-out, kill-shot demo moment.
 
-The Commons combines all three. Each person onboards a personal agent (Angel-style — swipe / vibe / strengths / context pack). The agent gets a VRM avatar, a voice, a persona. Then she joins the multiplayer room. Other humans + their agents are there. Everyone collaborates. Every spoken word, every artifact created, every decision made — grounded in Notion via Workers.
+MIMI combines all three. Each person onboards a personal agent (Angel-style — swipe / vibe / strengths / context pack). The agent gets a VRM avatar, a voice, a persona. Then she joins the multiplayer room. Other humans + their agents are there. Everyone collaborates. Every spoken word, every artifact created, every decision made — grounded in Notion via Workers.
 
 ## The pitch (one paragraph)
 
-The Commons is a multiplayer 3D workspace built on Notion's new Developer Platform. You create a personal AI agent in five minutes — give her a name, a vibe, a context pack. She gets a body and a voice. You drop her into the Commons, where your teammates and their agents are already there. You walk around, you talk, agents collaborate, artifacts get made. Every action — every spoken word, every decision, every doc shipped — lands in Notion as ground truth. Leave the room, open Notion on your phone, the receipts are there. Come back the next morning, your agent's been there overnight, did her work, has a brief ready for you in spatial voice.
+MIMI is a multiplayer 3D workspace built on Notion's new Developer Platform. You create a personal AI agent in five minutes — give her a name, a vibe, a context pack. She gets a body and a voice. You drop her into the Commons, where your teammates and their agents are already there. You walk around, you talk, agents collaborate, artifacts get made. Every action — every spoken word, every decision, every doc shipped — lands in Notion as ground truth. Leave the room, open Notion on your phone, the receipts are there. Come back the next morning, your agent's been there overnight, did her work, has a brief ready for you in spatial voice.
 
 ## Why this wins
 
@@ -59,7 +61,7 @@ The Commons is a multiplayer 3D workspace built on Notion's new Developer Platfo
 ┌────────────────────────────────────────────────────────────────┐
 │  AGENT RUNTIME (per-agent process, node + bun)                 │
 │  • claude sonnet 4.6 — persona-conditioned                     │
-│  • TTS via elevenlabs (per-agent voice id)                     │
+│  • Animalese (procedural, lifted from Angel) — no TTS service  │
 │  • STT via deepgram (when listening to humans)                 │
 │  • tools: speak, walk_to, pick_up, hand_off, query_notion,     │
 │           write_notion, query_other_agent                      │
@@ -67,11 +69,14 @@ The Commons is a multiplayer 3D workspace built on Notion's new Developer Platfo
 └────────────────────────────────────────────────────────────────┘
               ↓ every meaningful event
 ┌────────────────────────────────────────────────────────────────┐
-│  NOTION WORKERS (deployed via ntn)                             │
-│  • webhook receiver: scene events → notion db writes           │
-│  • scheduled sync (30 min): heartbeat, overnight agent ticks   │
-│  • agent tool: query_agent(name) callable by external agents   │
-│  • database sync: github PRs → in-world artifacts on the desk  │
+│  NOTION WORKERS (4 deployed via ntn — MAX NOTION TOOLING)      │
+│  ① mimi-world-events: webhooks in → notion db writes           │
+│  ② mimi-overnight-pulse: 30-min sync, wakes agents to pace     │
+│  ③ mimi-agent-tools: exposes mimi APIs as agent tools so       │
+│     external agents (claude code, cursor) can call back        │
+│  ④ mimi-github-bridge: github PR webhooks → desk artifacts     │
+│  + db sync: ai meeting notes → memory                          │
+│  + external agents api: claude code spawns chibi when invoked  │
 └────────────────────────────────────────────────────────────────┘
               ↓ ground truth
 ┌────────────────────────────────────────────────────────────────┐
@@ -88,17 +93,18 @@ The Commons is a multiplayer 3D workspace built on Notion's new Developer Platfo
 
 Skip the 269-card swipe — too much surface for 24h. Compressed:
 
-1. land on commons.[stephen domain]/onboard
+1. land on mimi.[stephen domain]/onboard
 2. one-page vibe picker: 4 archetypes × 2 vibes = 8 cards. pick 3 you like.
 3. quick form: name, what you're working on (1 sentence), what you want her to be good at (1 sentence)
-4. her face fades in, her voice line plays via elevenlabs
-5. "let her in" → drops into the commons multiplayer scene
+4. her chibi materializes — procedural mesh built from persona vector
+5. her first line of animalese plays with subtitle ("alright [name], let's get into it.")
+6. "let her in" → drops you into mimi (first person camera) — she's standing next to you
 
 ## Demo arc (3 min judging slot)
 
 ### [0:00 – 0:30] thesis hook + onboard one fresh agent
 
-stephen (live): "agents today are tools you summon. they don't have a body. they don't live anywhere. they don't remember the room they were in. the commons is a multiplayer workspace where your personal agent has a body, a voice, and a memory grounded in notion."
+stephen (live): "agents today are tools you summon. they don't have a body. they don't live anywhere. they don't remember the room they were in. mimi is a multiplayer workspace where your personal agent has a body, a voice, and a memory grounded in notion."
 
 maddy on stage: lands on the onboarding URL. picks vibes. her agent's face fades in. her agent says one line: "alright maddy, let's get into it." → drop into commons scene.
 
@@ -116,7 +122,7 @@ maddy on stage: lands on the onboarding URL. picks vibes. her agent's face fades
 
 stephen: "what's been happening here while we were prepping?"
 
-cut to projector: open notion.com on a different machine, navigate to the commons workspace.
+cut to projector: open notion.com on a different machine, navigate to mimi workspace.
 - residents db: stephen, maddy, agent-a, agent-b — last_active timestamps
 - events db: 47 events in the last 14 hours
 - artifacts db: 3 artifacts created overnight by agents alone
@@ -132,7 +138,7 @@ both agents walk to the desk. they speak to each other in elevenlabs voices (aud
 
 ### [2:30 – 3:00] CLOSE
 
-stephen: "every team is gonna have agents next year. they'll have bodies because that's how humans collaborate. and they'll live in notion because that's where the work goes. the commons is the room they hang out in. we built it in 24 hours on the new dev platform. simon — this is your dev platform's killer app."
+stephen: "every team is gonna have agents next year. they'll have bodies because that's how humans collaborate. and they'll live in notion because that's where the work goes. mimi is the room they hang out in. we built it in 24 hours on the new dev platform. simon — this is your dev platform's killer app."
 
 audible. unforgettable. tweet-able.
 
@@ -176,7 +182,7 @@ audible. unforgettable. tweet-able.
 
 ## Naming
 
-The Commons — locked. Carries the public-square feeling without being twee.
+MIMI — locked. Carries the public-square feeling without being twee.
 
 Repo will rename from `mimi` → `commons` after stephen confirms.
 
@@ -186,7 +192,7 @@ Repo will rename from `mimi` → `commons` after stephen confirms.
 - A general avatar editor
 - General-purpose agent marketplace
 - Real google/discord/meta context ingestion (vibe picker = enough)
-- Multi-room (one room, the commons, that's it)
+- Multi-room (one room, mimi, that's it)
 - Native VR (web first — webxr is post-hackathon)
 - Onboarding 8-beat reveal cascade (angel had this, we won't have time)
 
