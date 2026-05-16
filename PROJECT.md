@@ -6,6 +6,10 @@ A cozy 3D office where each team member's personal AI agent — generated as a u
 
 **Why chibi**: avoids uncanny-VR-dystopia trap. Reads as toy/playful/team, not parasocial. Fast to render. Big design space for differentiation. Demos beautifully on video. Procedural per-user generation is the viral loop.
 
+**Voice direction locked**: agents speak in **animalese** (animal-crossing-style procedural chirp voice). Humans speak normally via livekit voice. Subtitles do the semantic heavy lifting — chunky cartoon font, char-by-char reveal at ~30ms, single animalese sample per char. Per-agent sample bank mapped from persona vector (6 clusters: cheerful / sleepy / sassy / earnest / dry / warm).
+
+**Why animalese**: (1) Stephen has the runtime from Angel, zero new infra. (2) Zero TTS latency, zero TTS cost. (3) No uncanny valley — judges lean in instead of tuning out. (4) Pairs iconically with chibi for an animal-crossing-coded brand. (5) Subtitles carry meaning, so the demo reads as well on muted video as on a live mic.
+
 Built for the Notion Developer Platform Hackathon, May 16-17 2026.
 
 ---
