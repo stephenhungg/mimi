@@ -1,6 +1,10 @@
 # THE COMMONS
 
-A multiplayer 3D workspace where humans and personal AI agents share a room, collaborate in real time, and every action is grounded in Notion.
+A cozy 3D office where each team member's personal AI agent — generated as a unique chibi avatar — lives, works, and collaborates with your team. Notion is the canonical state for everything that happens.
+
+**Visual direction locked**: chibi avatars (low-poly, friendly, instagram-able, each procedurally unique to its owner's persona) + cozy office (warm lighting, plants, desks with coffee/laptops/plants/notepads) + VRChat-style multiplayer presence.
+
+**Why chibi**: avoids uncanny-VR-dystopia trap. Reads as toy/playful/team, not parasocial. Fast to render. Big design space for differentiation. Demos beautifully on video. Procedural per-user generation is the viral loop.
 
 Built for the Notion Developer Platform Hackathon, May 16-17 2026.
 
