@@ -8,6 +8,8 @@ Multiplayer communication is **text-based chat** in v1 (no voice). Agents speak 
 
 **Brand: 'mimi.'** — lowercase with period.
 
+**Palette locked: ASPHALT + PAPER** — `#302F2C` asphalt (warm near-black, olive undertone) and `#EFEDE3` paper (warm off-white, cream undertone). Never pure black or white — both colors have warmth in their undertone. This gives kawaii chibis room to breathe while keeping a serious-product brand frame. Full spec in [`design/BRAND.md`](./design/BRAND.md). Linear / Vercel / Arc brand polish meets animal-crossing-coded sticker illustration.
+
 ---
 
 ## Core mental model
