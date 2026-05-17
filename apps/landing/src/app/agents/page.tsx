@@ -239,6 +239,7 @@ export default function AgentsPage() {
         });
       } else {
         gsap.set(".agents-pop", { autoAlpha: 0, y: 24, scale: 0.98 });
+        gsap.set(".agents-motion-nav", { autoAlpha: 0, y: -14 });
         gsap.set(".agents-wordmark-pop", { autoAlpha: 0, y: 46, scale: 0.9, rotate: -2 });
         gsap.set(".agents-scene-pop", { autoAlpha: 0, y: 54, scale: 0.92, rotate: 2 });
         gsap.set(".agents-reveal-up", { autoAlpha: 0, y: 54, scale: 0.98 });
@@ -529,9 +530,11 @@ function Hero() {
         <div className="relative z-10 flex flex-col items-start">
           <p className="agents-pop agents-kicker mb-4">tiny agents, serious receipts</p>
           <h1 className="sr-only">mimi.</h1>
-          <img className="agents-wordmark-pop w-full max-w-[580px]" src={media.wordmark} alt="mimi." />
+          <div className="agents-wordmark-pop agents-wordmark-frame">
+            <img src={media.wordmark} alt="mimi." />
+          </div>
           <p className="agents-pop mt-5 max-w-[540px] font-display text-[clamp(2.25rem,8vw,5.9rem)] font-bold leading-[0.88] tracking-normal">
-            a cozy ops room for every little thing yelling at you.
+            your tiny ops room for noisy tools.
           </p>
           <p className="agents-pop mt-5 max-w-[520px] font-inter text-[18px] font-bold leading-[1.35] text-agents-gray md:text-[22px]">
             mimi runs a chibi specialist squad across github, gmail, calendar, and notion, then writes the useful stuff back home.

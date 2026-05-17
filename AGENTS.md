@@ -1,52 +1,19 @@
 <claude-mem-context>
 # Memory Context
 
-# [mimi] recent context, 2026-05-17 4:59am PDT
+# [mimi] recent context, 2026-05-17 5:07am PDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (16,236t read) | 263,162t work | 94% savings
+Stats: 50 obs (18,952t read) | 754,506t work | 97% savings
 
 ### May 16, 2026
 S278 Write .claude/settings.json permission allowlist + fix Next.js landing page 500 (missing gsap vendor chunk) (May 16 at 6:42 PM)
 S277 Write .claude/settings.json permission allowlist + landing page Next.js 15 GSAP build error (May 16 at 6:42 PM)
 S279 Write .claude/settings.json + fix landing page Next.js build (500 from stale dev build) (May 16 at 6:55 PM)
 ### May 17, 2026
-247 4:28a 🔵 All Required Kawaii Image Assets Present in public/
-248 4:29a 🔵 Visual Audit Results — Two Issues Found: Nav Transform Bug and Hover Inset Not Triggering
-249 " 🟣 User Requested Cute Fonts Addition
-250 4:30a 🔵 Mimi Landing App Font System Architecture
-251 " 🟣 Added Fredoka + Nunito Cute Fonts to Mimi Landing
-252 " 🟣 Mimi Landing Font Migration Build Verified
-253 4:31a 🟣 Fredoka + Nunito Font Change Committed and Pushed to Main
-254 " 🔵 Mimi Landing App Full Route Map Discovered
-255 " 🟣 Mimi /agents Page Visually Verified with New Fonts
-256 4:32a 🔵 Font Audit Confirmed Fredoka + Nunito Rendering Correctly on Desktop and Mobile
-257 4:33a 🟣 User Requested Cute Fonts for Project UI
-258 " 🔵 Mimi Landing Agents Page Font Architecture
-260 " ✅ Removed All `uppercase` Tailwind Classes from Agents Page
-261 4:34a 🔵 Pre-existing ESLint Warning in connected/page.tsx
-262 " 🔵 Pre-existing TypeScript Errors in Notion API Routes
-263 " 🔵 Mimi Repo Working Tree State — Multiple In-Progress Changes
-266 4:35a 🟣 Mimi Agents Page Rebranded from Portfolio to AI Agent Product Page
-267 " 🔵 Mimi Landing Tailwind Font Configuration — Current State
-270 4:36a 🔵 Mimi Landing globals.css Font Stack — Self-Hosted Neue Haas Grotesk
-271 " 🔵 @next/font Package Deprecated — No Longer Available
-272 " 🔵 Mimi Landing layout.tsx — Font Loading Pattern via next/font/google
-274 " 🟣 Cute Fonts Added — Fredoka and Nunito Replace Neue Haas and Inter on Agents Page
-275 " 🔵 CDP Runtime.evaluate Consistently Times Out on Agents Page
-276 4:37a 🟣 Cute/Decorative Fonts Requested for Project
-273 " 🔵 CDP Font Audit Script Timed Out on Runtime.evaluate
-277 4:39a 🟣 User Requested Cute Fonts Addition
-278 " 🟣 Mimi Kawaiify Pass — Agents Page Redesigned with Cute Fonts & Brand
-279 " 🔵 Font Implementation Confirmed in layout.tsx — Fredoka & Nunito via next/font/google
-281 4:40a 🔵 Mimi Root Landing Page Structure — Squad, Pillars, Notion Integration
-282 4:41a 🔵 Kawaiify Pass — Modified Files Confirmed, Dev Server Active
-283 " ✅ Root `/` Page Now Re-exports from `/agents` Page
-284 " 🔵 Font CSS Variables Not Present in SSR HTML — Next.js Font Injection Is Client-Side
-285 " 🔵 Full Agents Page HTML Confirmed in SSR — Mimi Content Verified Live
 286 4:42a ✅ Kawaiify Pass Fully Verified — Todo Updated with Root Route and ESLint Confirmations
 287 4:43a 🔵 Kawaiify Pass — Full Diff Stats: 527 Insertions, 233 Deletions Across 5 Files
 288 4:46a 🟣 Kawaiify Pass Committed — feat: kawaiify agents page with Fredoka/Nunito fonts and mimi brand content
@@ -64,6 +31,39 @@ S279 Write .claude/settings.json + fix landing page Next.js build (500 from stal
 300 4:55a 🔵 Mimi Project File Structure and Tailwind Config Audited
 301 4:58a 🟣 Mimi Agents Page Fully Rebuilt as Mascot-Led Kawaii Landing
 302 4:59a 🟣 User Requested Explanation of What Was Shipped
+303 " ⚖️ LiveKit Purge Plan Initiated in Mimi Project
+305 " 🟣 Mimi Agents CSS Design System — Full Kawaii Token Sheet Written
+304 " 🔵 Mimi Repo LiveKit Purge State: Partial Removal with Regression
+308 " 🟣 LiveKit Replaced with Notion Polling Architecture in Mimi
+309 " 🟣 AgentMesh System Built with 3D Avatar Instances
+306 5:00a 🔵 Build Passes Clean — Zero TypeScript and ESLint Errors After Cuteness Overloadmaxx Rewrite
+307 " 🔵 Pre-existing TypeScript Error in .next/types for Missing agent-state Route
+310 " 🔵 tsconfig.json Includes .next/types — Root Cause of Stale TS2307 Errors
+312 " 🔵 Working Tree vs d58913d: Exact Delta for LiveKit Re-Purge
+313 " 🟣 ChatOverlay Upgraded to Orchestrator Pattern with /api/team-chat
+311 5:01a 🔵 Confirmed: agent-state Route Deleted From Source But Stale .next/types Stub Remains
+315 " 🔵 TypeScript Clean When .next/types Errors Filtered — Source Files Have Zero Type Errors
+319 " 🟣 Cuteness Overloadmaxx Pass Complete — Live Dev Server Serving New Kawaii Landing at Both / and /agents
+314 " 🔴 LiveKit Code Purged from apps/web via git restore from d58913d
+316 " 🔴 livekitRoom Field Renamed to roomId Across Landing App with Backward-Compat Migration
+317 " 🔴 LiveKit ENV Constants and Comment References Removed from packages/types
+318 5:02a 🔄 All Remaining LiveKit Comment References Scrubbed from Source Files
+320 " 🔄 Final LiveKit Comment Sweep Completed Across Web Components and Landing API
+321 " ✅ READMEs Updated to Reflect HTTP Polling Architecture; Persona Fixture Left as-Is
+323 " 🟣 Mimi Agents Page Live in Chrome — Visual QA Confirmed Kawaii Composition Rendering Correctly
+322 " 🔵 LiveKit Purge Complete — Only 3 Intentional Lines Remain
+324 5:03a 🔴 LiveKit Purge 100% Complete — Zero References Remain in Entire Codebase
+325 " ✅ Realtime Purge Progress Tracked in tasks/todo.md
+334 " 🟣 Mimi Landing: Wordmark Frame Component + Nav Visibility Fix
+326 " 🔵 TypeCheck/Build Running for All Three Packages Simultaneously
+327 " 🔵 All TypeCheck and Build Gates Passed After LiveKit Purge
+328 " 🔵 Landing App Next.js Build Passed with Full Route Manifest
+329 5:04a 🔵 Pre-Commit Diff Summary: 35 Files, 3 New Untracked Routes
+330 " 🟣 /api/team-chat Route Built: Claude-Powered Message Orchestrator
+331 " 🟣 LiveKit Purge + Group Chat Orchestrator Committed and Pushed as Single Commit
+333 " ✅ Mimi Repo Fully Synced: HEAD = origin/main at 2081dd5
+335 5:05a ⚖️ Greenfield "Cuteness Overload" Project Initiated
+336 5:06a 🔵 mimi. — 3D Agent Workspace for Notion Landing Page
 
-Access 263k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 755k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>
