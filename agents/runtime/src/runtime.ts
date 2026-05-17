@@ -19,7 +19,7 @@ import {
 } from "@mimi/types";
 import type { MimiNotion } from "@mimi/notion-client";
 
-import type { LiveKitBroadcaster } from "./broadcaster.js";
+import type { Broadcaster } from "./broadcaster.js";
 import type { PersonaConfig } from "../personas/index.js";
 import { TOOLS, runTool, type ToolContext } from "./tools.js";
 
@@ -29,7 +29,7 @@ export interface AgentRuntimeOptions {
   persona: PersonaConfig;
   systemPrompt: string;
   notion: MimiNotion;
-  broadcaster: LiveKitBroadcaster;
+  broadcaster: Broadcaster;
   anthropic: Anthropic;
   model: string;
 }
@@ -50,7 +50,7 @@ export class AgentRuntime {
   private readonly persona: PersonaConfig;
   private readonly systemPrompt: string;
   private readonly notion: MimiNotion;
-  private readonly broadcaster: LiveKitBroadcaster;
+  private readonly broadcaster: Broadcaster;
   private readonly anthropic: Anthropic;
   private readonly model: string;
 
@@ -261,6 +261,7 @@ export class AgentRuntime {
       { role: "user", content: userText },
     ];
 
+    process.stderr.write(`[${this.identity}] handling event ${event.id} (${event.type})\n`);
     try {
       for (let turn = 0; turn < MAX_TOOL_TURNS; turn++) {
         const response = await this.anthropic.messages.create({
@@ -281,11 +282,13 @@ export class AgentRuntime {
 
         if (response.stop_reason !== "tool_use" || toolUses.length === 0) {
           // end_turn (or stop / max_tokens / etc) — done.
+          process.stderr.write(`[${this.identity}] turn ${turn + 1} done (stop=${response.stop_reason}, tools=${toolUses.length})\n`);
           break;
         }
 
         const toolResults: Anthropic.ToolResultBlockParam[] = [];
         for (const tu of toolUses) {
+          process.stderr.write(`[${this.identity}] → ${tu.name}(${JSON.stringify(tu.input).slice(0, 120)})\n`);
           const result = await runTool(tu.name, tu.input, ctx);
           toolResults.push({
             type: "tool_result",

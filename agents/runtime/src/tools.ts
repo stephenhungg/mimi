@@ -14,7 +14,7 @@ import {
 } from "@mimi/types";
 import type { MimiNotion } from "@mimi/notion-client";
 
-import type { LiveKitBroadcaster } from "./broadcaster.js";
+import type { Broadcaster } from "./broadcaster.js";
 
 // ─── tool input shapes (mirrored from json schema, for type safety) ─────────
 
@@ -148,7 +148,7 @@ export const TOOLS: Anthropic.Tool[] = [
 export interface ToolContext {
   species: Species;
   identity: string;
-  broadcaster: LiveKitBroadcaster;
+  broadcaster: Broadcaster;
   notion: MimiNotion;
   // mutable runtime state — updated by tool side effects.
   state: {

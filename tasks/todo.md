@@ -59,7 +59,50 @@ remaining fidelity notes:
 
 ## headed animation fidelity pass
 
-- [ ] sample reference load, scroll, and hover motion in headed chrome.
-- [ ] sample local `/agents` motion in the same headed chrome setup.
-- [ ] patch gsap timings/transforms/hover behavior where the local motion diverges.
-- [ ] rebuild and verify `/agents` with headed screenshots plus lint/typecheck.
+- [x] sample reference load, scroll, and hover motion in headed chrome.
+- [x] sample local `/agents` motion in the same headed chrome setup.
+- [x] patch gsap timings/transforms/hover behavior where the local motion diverges.
+- [x] rebuild and verify `/agents` with headed screenshots plus lint/typecheck.
+
+### headed animation pass notes
+
+- found and fixed a stale next server/build mismatch where `/agents` was returning a css asset that no longer existed; rebuilt clean before sampling.
+- hero media now matches the reference scroll parallax at 1440x1200: `scrollY 240 -> y -192`, `640 -> -512`, `1050 -> -840`, `1200 -> -960`.
+- removed non-reference motion from work cards, service preview, hero copy/nav, and final video; those are static/visible in the headed reference samples.
+- kept the headline load as the only hero load tween, tuned to the framer-style slide-up without opacity fade.
+- latest artifacts:
+  - `tasks/artifacts/agents-headed/motion-audit-v2.json`
+  - `tasks/artifacts/agents-headed/motion-audit-local-v4.json`
+  - `tasks/artifacts/agents-headed/motion-audit-local-v5.json`
+  - `tasks/artifacts/agents-headed/local-v4-hover.png`
+  - `tasks/artifacts/agents-headed/local-v4-final-scroll.png`
+
+## headed hover audit
+
+- [x] audit nav hover against the framer reference.
+- [x] audit work card hover against the framer reference.
+- [x] audit service row hover against the framer reference.
+- [x] audit client row hover against the framer reference.
+- [x] audit footer link hover against the framer reference.
+- [x] patch mismatches and verify local production bundle in headed chrome.
+
+### hover audit notes
+
+- nav links matched the reference: white to `rgb(134, 134, 139)` on hover.
+- footer links matched the reference: gray to `rgb(240, 240, 240)` on hover.
+- work cards now match the reference cursor behavior: `pointer` before hover, `none` on hover.
+- client logos now match the reference headed sample by staying visible at `32px` before and after hover instead of animating in from width `0`.
+- service hover remains local active-state behavior; the framer DOM sample reports service rows as static text, so no extra transform/scale was added.
+- latest hover artifacts:
+  - `tasks/artifacts/agents-headed-hover/hover-audit.json`
+  - `tasks/artifacts/agents-headed-hover/hover-verify-local.json`
+  - `tasks/artifacts/agents-headed-hover/local-hover-verified-work.png`
+  - `tasks/artifacts/agents-headed-hover/local-hover-verified-client.png`
+
+## deeper motion fidelity pass
+
+- [ ] restore hover-only work-card inset media.
+- [ ] add gsap smooth scrolling with `ScrollSmoother`.
+- [ ] audit reference motion deeper through load, scroll, card hover, service activation, client hover, and footer.
+- [ ] tune local gsap against headed chrome samples.
+- [ ] rebuild, verify, and record evidence.

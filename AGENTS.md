@@ -1,25 +1,19 @@
 <claude-mem-context>
 # Memory Context
 
-# [mimi] recent context, 2026-05-16 7:38pm PDT
+# [mimi] recent context, 2026-05-17 3:54am PDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (17,492t read) | 205,402t work | 91% savings
+Stats: 50 obs (17,854t read) | 297,178t work | 94% savings
 
 ### May 16, 2026
 S278 Write .claude/settings.json permission allowlist + fix Next.js landing page 500 (missing gsap vendor chunk) (May 16 at 6:42 PM)
 S277 Write .claude/settings.json permission allowlist + landing page Next.js 15 GSAP build error (May 16 at 6:42 PM)
 S279 Write .claude/settings.json + fix landing page Next.js build (500 from stale dev build) (May 16 at 6:55 PM)
-154 7:15p 🔵 TypeScript and ESLint Both Pass Clean After page.tsx Changes
-155 " 🟣 Next.js 15 Production Build Passes — All 5 Static Pages Generated
-156 7:16p 🔵 Mimi Monorepo Contains Second Next.js App with LiveKit API Route
-157 " 🟣 Comprehensive CSS/DOM Audit Script Runs Against Local Build for Visual QA
-158 " 🔵 DOM Audit Reveals Missing Selectors for work-inset, service-preview, client-mark, final-video
-159 7:17p ⚖️ Reverse Engineering Framer Agents Site into Next.js + GSAP
-160 " 🔵 CSS/DOM Audit: agents.framer.website Layout Specs Extracted
+160 7:17p 🔵 CSS/DOM Audit: agents.framer.website Layout Specs Extracted
 161 " 🔵 Local Next.js Dev Server Verified: All Assets Loading Clean
 162 " 🔵 Client Mark Hover Animation Not Yet Wired: opacity:0, width:0px After Hover
 163 7:18p 🔵 CSS Class .client-row Not Found in DOM — Selector Mismatch
@@ -63,6 +57,13 @@ S279 Write .claude/settings.json + fix landing page Next.js build (500 from stal
 203 " ✅ Hero Component Redesigned: Left-Aligned Copy, Top Title, Static Poster Video, No Gradient
 204 " 🔵 browse `focus` Command Requires Headed Mode via `connect` First
 205 " 🔵 /agents Route Serving Stale Build Cache After Hero Changes
+206 7:38p 🔵 Hero Component Source Code Unchanged — User's Layout Changes Not Yet Applied
+213 7:39p 🔵 User asks if mouse hover effects were audited in agents clone
+214 7:55p 🟣 Headed hover audit completed — ref vs local comparison across 7 interaction targets
+215 " 🔴 TypeScript error: cleanup variable referenced after its declaration was deleted
+### May 17, 2026
+216 1:23a 🔄 Removed client-row GSAP hover handlers and cleanup array from useGSAP — replaced with CSS-only approach
+217 " 🟣 agents page build succeeds at 48.6kB after hover audit cleanup
 
-Access 205k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 297k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>

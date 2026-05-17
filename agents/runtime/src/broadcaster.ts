@@ -1,6 +1,9 @@
 // livekit broadcaster — sends agent state over the room data channel.
 // uses RoomServiceClient.sendData which broadcasts server-side without
 // spinning up a real participant. one helper per outbound message kind.
+//
+// livekit is OPTIONAL. fromEnv() returns NullBroadcaster (no-op) if creds
+// aren't set, so agents still work for notion-only demos.
 
 import { AccessToken, DataPacket_Kind, RoomServiceClient } from "livekit-server-sdk";
 
@@ -13,6 +16,46 @@ import {
   type Position,
   type Species,
 } from "@mimi/types";
+
+// the public contract any broadcaster implementation satisfies. runtime depends
+// on this, not the concrete class — so swapping in a null impl is type-safe.
+export interface Broadcaster {
+  start(): Promise<void>;
+  broadcast(msg: Broadcast): Promise<void>;
+  broadcastState(state: AgentState, pos?: Position, mood?: Mood): Promise<void>;
+  broadcastSpeak(text: string): Promise<void>;
+  disconnect(): Promise<void>;
+}
+
+// no-op broadcaster used when livekit env isn't configured. logs the first
+// call so the operator knows livekit is faded (not broken).
+export class NullBroadcaster implements Broadcaster {
+  private warned = false;
+  private warn(kind: string): void {
+    if (this.warned) return;
+    this.warned = true;
+    console.warn(`[broadcaster] livekit faded — ${kind} broadcasts will no-op. set LIVEKIT_URL/API_KEY/API_SECRET to enable 3D presence.`);
+  }
+  async start(): Promise<void> { this.warn("start"); }
+  async broadcast(): Promise<void> { /* silent — would spam */ }
+  async broadcastState(): Promise<void> {}
+  async broadcastSpeak(): Promise<void> {}
+  async disconnect(): Promise<void> {}
+}
+
+// factory — returns a real broadcaster if livekit env is configured, else null.
+export function broadcasterFromEnv(
+  env: Record<string, string | undefined>,
+  opts: { identity: string; species: Species; name: string },
+): Broadcaster {
+  const url = env[ENV.LIVEKIT_URL];
+  const apiKey = env[ENV.LIVEKIT_API_KEY];
+  const apiSecret = env[ENV.LIVEKIT_API_SECRET];
+  if (!url || !apiKey || !apiSecret) {
+    return new NullBroadcaster();
+  }
+  return LiveKitBroadcaster.fromEnv(env, opts);
+}
 
 export interface BroadcasterOptions {
   url: string;

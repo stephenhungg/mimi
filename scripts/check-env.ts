@@ -76,12 +76,12 @@ const CHECKS: Check[] = [
   },
   {
     name: "LIVEKIT_URL + creds set",
-    required: true,
+    required: false, // optional — agents work without livekit, just no multiplayer 3D presence
     run: async (env) => {
       const u = env[ENV.LIVEKIT_URL];
       const k = env[ENV.LIVEKIT_API_KEY];
       const s = env[ENV.LIVEKIT_API_SECRET];
-      if (!u || !k || !s) return { ok: false, note: "LIVEKIT_URL/API_KEY/API_SECRET required" };
+      if (!u || !k || !s) return { ok: false, note: "livekit faded — no 3D presence, but agents + notion still work" };
       if (!u.startsWith("wss://")) return { ok: false, note: `LIVEKIT_URL should be wss://, got ${u.slice(0, 24)}…` };
       return { ok: true, note: u.replace(/^wss:\/\//, "").slice(0, 32) };
     },

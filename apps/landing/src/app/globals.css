@@ -125,22 +125,35 @@ img, video { display: block; max-width: 100%; }
   z-index: 50;
 }
 
-.agents-motion-nav,
-.agents-motion-copy,
-.agents-motion-title {
-  opacity: 0.001;
-  will-change: transform, opacity;
-}
-
 .agents-motion-nav {
-  transform: translate3d(-50%, -48px, 0);
+  opacity: 1;
+  transform: translate3d(-50%, 0, 0);
+}
+
+.agents-motion-copy {
+  opacity: 1;
 }
 
 .agents-motion-title {
-  transform: translate3d(0, 128px, 0);
+  opacity: 1;
+  transform: translate3d(0, 61px, 0);
+  will-change: transform;
 }
 
 .agents-reveal-up {
+  will-change: transform, opacity;
+}
+
+.agents-smooth-content {
+  background: var(--agents-black);
+  will-change: transform;
+}
+
+.agents-work-inset {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.96);
+  visibility: hidden;
   will-change: transform, opacity;
 }
 
@@ -150,6 +163,15 @@ img, video { display: block; max-width: 100%; }
 .agents-client-mark,
 .agents-final-video {
   will-change: transform;
+}
+
+.agents-work-card:hover,
+.agents-work-card:hover * {
+  cursor: none;
+}
+
+.agents-client-mark {
+  width: 32px;
 }
 
 .agents-mix-difference {

@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollSmoother } from "gsap/ScrollSmoother";
 
-gsap.registerPlugin(useGSAP, ScrollTrigger);
+gsap.registerPlugin(useGSAP, ScrollTrigger, ScrollSmoother);
 
 const media = {
   heroImage:
@@ -133,7 +134,7 @@ function LoopVideo({
 }
 
 export default function AgentsPage() {
-  const root = useRef<HTMLElement>(null);
+  const root = useRef<HTMLDivElement>(null);
   const [activeService, setActiveService] = useState(0);
   const [clock, setClock] = useState("20:24");
 
@@ -155,72 +156,60 @@ export default function AgentsPage() {
 
   useGSAP(
     () => {
-      const mm = gsap.matchMedia();
       const cleanup: Array<() => void> = [];
 
-      gsap.set(".agents-work-inset", { autoAlpha: 0, scale: 0.94 });
-      gsap.set(".agents-client-mark", { autoAlpha: 0, scale: 0.7, width: 0 });
-      gsap.set(".agents-final-video", { autoAlpha: 0, y: 48 });
+      const smoother = ScrollSmoother.create({
+        wrapper: ".agents-smooth-wrapper",
+        content: ".agents-smooth-content",
+        smooth: 1.15,
+        effects: false,
+        normalizeScroll: false,
+        ignoreMobileResize: true
+      });
 
-      gsap
-        .timeline({ defaults: { duration: 1.05, ease: "expo.out" } })
-        .to(".agents-motion-nav", { opacity: 1, y: 0 }, 0)
-        .to(".agents-motion-title", { opacity: 1, y: 0 }, 0.05)
-        .to(".agents-motion-copy", { opacity: 1 }, 0.5);
+      gsap.to(".agents-motion-title", {
+        y: 0,
+        delay: 0.08,
+        duration: 0.62,
+        ease: "power3.out"
+      });
 
       gsap.to(".agents-hero-media", {
-        scale: 1.08,
+        y: () => window.innerHeight * 0.2,
         ease: "none",
         scrollTrigger: {
           trigger: ".agents-hero",
           start: "top top",
           end: "bottom top",
-          scrub: true
+          scrub: true,
+          invalidateOnRefresh: true
         }
       });
 
-      ScrollTrigger.batch(".agents-reveal-up", {
-        start: "top 82%",
-        once: true,
-        onEnter: (batch) => {
-          gsap.fromTo(
-            batch,
-            { opacity: 0.001, y: 48 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 1,
-              stagger: 0.08,
-              ease: "expo.out",
-              overwrite: true
-            }
-          );
-        }
-      });
-
+      gsap.set(".agents-work-inset", { autoAlpha: 0, scale: 0.96 });
       gsap.utils.toArray<HTMLElement>(".agents-work-card").forEach((card) => {
-        const baseMedia = card.querySelectorAll<HTMLElement>(":scope > img, :scope > video");
         const inset = card.querySelector<HTMLElement>(".agents-work-inset");
-        const insetVideo = inset?.querySelector("video");
+        const insetVideo = card.querySelector<HTMLVideoElement>(".agents-work-inset video");
         const onEnter = () => {
           insetVideo?.play().catch(() => undefined);
-          gsap.to(baseMedia, { scale: 1.035, duration: 0.9, ease: "expo.out" });
           gsap.to(inset, {
             autoAlpha: 1,
             scale: 1,
-            duration: 0.65,
-            ease: "expo.out",
+            duration: 0.42,
+            ease: "power3.out",
             overwrite: true
           });
         };
         const onLeave = () => {
-          insetVideo?.pause();
-          gsap.to(baseMedia, { scale: 1, duration: 0.9, ease: "expo.out" });
+          if (insetVideo) {
+            insetVideo.pause();
+            insetVideo.currentTime = 0;
+          }
           gsap.to(inset, {
             autoAlpha: 0,
-            scale: 0.94,
-            duration: 0.55,
-            ease: "expo.out",
+            scale: 0.96,
+            duration: 0.32,
+            ease: "power2.out",
             overwrite: true
           });
         };
@@ -237,41 +226,6 @@ export default function AgentsPage() {
         });
       });
 
-      gsap.utils.toArray<HTMLElement>(".agents-client-row").forEach((row) => {
-        const mark = row.querySelector<HTMLElement>(".agents-client-mark");
-        const onEnter = () => {
-          gsap.to(mark, {
-            autoAlpha: 1,
-            scale: 1,
-            width: 32,
-            duration: 0.45,
-            ease: "expo.out",
-            overwrite: true
-          });
-        };
-        const onLeave = () => {
-          gsap.to(mark, {
-            autoAlpha: 0,
-            scale: 0.7,
-            width: 0,
-            duration: 0.4,
-            ease: "expo.out",
-            overwrite: true
-          });
-        };
-
-        row.addEventListener("mouseenter", onEnter);
-        row.addEventListener("focusin", onEnter);
-        row.addEventListener("mouseleave", onLeave);
-        row.addEventListener("focusout", onLeave);
-        cleanup.push(() => {
-          row.removeEventListener("mouseenter", onEnter);
-          row.removeEventListener("focusin", onEnter);
-          row.removeEventListener("mouseleave", onLeave);
-          row.removeEventListener("focusout", onLeave);
-        });
-      });
-
       gsap.utils.toArray<HTMLElement>(".agents-service-row").forEach((row, index) => {
         ScrollTrigger.create({
           trigger: row,
@@ -282,50 +236,29 @@ export default function AgentsPage() {
         });
       });
 
-      gsap.to(".agents-final-video", {
-        autoAlpha: 1,
-        y: 0,
-        duration: 1,
-        ease: "expo.out",
-        scrollTrigger: {
-          trigger: ".agents-final-section",
-          start: "top 68%",
-          toggleActions: "play none none reverse"
-        }
-      });
-
-      mm.add("(min-width: 810px)", () => {
-        gsap.to(".agents-service-preview", {
-          yPercent: 16,
-          ease: "none",
-          scrollTrigger: {
-            trigger: ".agents-services-section",
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 0.7
-          }
-        });
-      });
-
       return () => {
         cleanup.forEach((remove) => remove());
-        mm.revert();
+        smoother.kill();
       };
     },
     { scope: root }
   );
 
   return (
-    <main ref={root} className="agents-page agents-noise min-h-screen overflow-hidden bg-agents-black">
+    <div ref={root} className="agents-page agents-noise min-h-screen bg-agents-black">
       <AgentsNav />
-      <Hero />
-      <FeaturedWork />
-      <Services activeService={activeService} onService={setActiveService} />
-      <Clients />
-      <FinalSection />
-      <Footer clock={clock} />
+      <div id="smooth-wrapper" className="agents-smooth-wrapper">
+        <main id="smooth-content" className="agents-smooth-content">
+          <Hero />
+          <FeaturedWork />
+          <Services activeService={activeService} onService={setActiveService} />
+          <Clients />
+          <FinalSection />
+          <Footer clock={clock} />
+        </main>
+      </div>
       <FramerBadge />
-    </main>
+    </div>
   );
 }
 
@@ -355,7 +288,7 @@ function Hero() {
       <div className="absolute inset-0 overflow-hidden bg-agents-black">
         <img className="agents-hero-media h-full w-full object-cover" src={media.heroImage} alt="" />
         <LoopVideo
-          className="agents-hero-media absolute inset-0 h-full w-full object-cover opacity-80"
+          className="agents-hero-media absolute inset-0 h-full w-full object-cover"
           src={media.heroVideo}
         />
       </div>
@@ -493,7 +426,6 @@ function FinalSection() {
       <LoopVideo
         className="agents-final-video absolute right-4 top-32 h-[83px] w-[147px] object-cover md:left-[39.8%] md:top-10 md:h-[360px] md:w-[640px]"
         src={media.heroVideo}
-        autoPlay={false}
       />
       <div className="relative flex flex-col font-display text-[24px] font-semibold uppercase leading-[24px] text-agents-white md:text-[40px] md:leading-[40px]">
         <p className="agents-reveal-up md:ml-[26.35%]">driven by ideas</p>

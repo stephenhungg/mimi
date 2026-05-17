@@ -9,7 +9,7 @@ import { ENV } from "@mimi/types";
 import { MimiNotion } from "@mimi/notion-client";
 
 import { isSpecies } from "../personas/index.js";
-import { LiveKitBroadcaster } from "./broadcaster.js";
+import { broadcasterFromEnv } from "./broadcaster.js";
 import { loadPersona } from "./load-persona.js";
 import { AgentRuntime } from "./runtime.js";
 import { startListener } from "./event-listener.js";
@@ -34,7 +34,7 @@ async function main(): Promise<void> {
 
   const anthropic = new Anthropic({ apiKey: anthropicKey });
   const notion = MimiNotion.fromEnv();
-  const broadcaster = LiveKitBroadcaster.fromEnv(process.env, {
+  const broadcaster = broadcasterFromEnv(process.env, {
     identity: config.identity,
     species: config.species,
     name: config.name,
