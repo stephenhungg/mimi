@@ -2,142 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "Inter";
-  src: url("https://framerusercontent.com/assets/GrgcKwrN6d3Uz8EwcLHZxwEfC4.woff2");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("https://framerusercontent.com/assets/yDtI2UI8XcEg1W2je9XPN3Noo.woff2");
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Inter Display";
-  src: url("https://framerusercontent.com/assets/PfdOpgzFf7N2Uye9JX7xRKYTgSc.woff2");
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Inter Display";
-  src: url("https://framerusercontent.com/assets/qITWJ2WdG0wrgQPDb8lvnYnTXDg.woff2");
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-}
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 
 :root {
-  --agents-black: #080808;
-  --agents-white: #f0f0f0;
-  --agents-gray: #86868b;
+  --asphalt: #302F2C;
+  --paper: #EFEDE3;
+  --paper-2: #e3e0d1;
+  --accent-tiger: #d97706;
+  --accent-otter: #3b82f6;
+  --accent-bunny: #ec4899;
+  --accent-dog: #eab308;
+  --accent-giraffe: #65a30d;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html {
-  background: var(--agents-black);
-  scroll-behavior: smooth;
-}
-
-body {
-  min-width: 320px;
+html, body {
   margin: 0;
-  background: var(--agents-black);
-  color: var(--agents-white);
-  font-family: Inter, "Inter Placeholder", sans-serif;
+  padding: 0;
+  background: var(--paper);
+  color: var(--asphalt);
+  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+a { color: inherit; text-decoration: none; }
+img, video { display: block; max-width: 100%; }
+
+.pixel { font-family: "Press Start 2P", monospace; }
+.asphalt { color: var(--asphalt); }
+.paper { color: var(--paper); }
+.bg-asphalt { background: var(--asphalt); }
+.bg-paper { background: var(--paper); }
+
+.sticker {
+  border: 3px solid var(--asphalt);
+  box-shadow: 6px 6px 0 var(--asphalt);
 }
 
-img,
-video {
-  display: block;
-  max-width: none;
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border: 3px solid var(--asphalt);
+  border-radius: 9999px;
+  background: var(--asphalt);
+  color: var(--paper);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.pill:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--asphalt);
 }
 
-::selection {
-  background: var(--agents-white);
-  color: var(--agents-black);
-}
-
-.agents-noise::after {
-  background-image: url("https://framerusercontent.com/images/rR6HYXBrMmX4cRpXfXUOvpvpB0.png");
-  content: "";
-  inset: -200%;
-  opacity: 0.05;
-  pointer-events: none;
-  position: fixed;
-  width: 400%;
-  height: 400%;
-  z-index: 50;
-}
-
-.motion-nav,
-.motion-copy,
-.motion-title {
-  opacity: 0.001;
-  will-change: transform, opacity;
-}
-
-.motion-nav {
-  transform: translate3d(-50%, -48px, 0);
-}
-
-.motion-title {
-  transform: translate3d(0, 128px, 0);
-}
-
-.reveal-up {
-  will-change: transform, opacity;
-}
-
-.work-card img,
-.work-card video,
-.service-preview img,
-.client-mark,
-.final-video {
-  will-change: transform;
-}
-
-.mix-difference {
-  mix-blend-mode: difference;
-}
-
-.agents-fit-text {
-  font-size: clamp(7rem, 46vw, 11.25rem);
-  letter-spacing: -0.06em;
-  line-height: 0.8;
-}
-
-@media (min-width: 810px) {
-  .agents-fit-text {
-    font-size: clamp(11rem, 26.5vw, 24.5rem);
-  }
-}
-
-.agents-watermark {
-  font-size: 320px;
-  letter-spacing: -0.04em;
-  line-height: 0.8;
-}
-
-@media (max-width: 809.98px) {
-  .agents-watermark {
-    font-size: 320px;
-  }
-}
+::selection { background: var(--asphalt); color: var(--paper); }

@@ -2,6 +2,8 @@ import { PointerLockControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { Vector3 } from "three";
+import { useTyping } from "../lib/typing";
+import { playerPosStore } from "../lib/room-context";
 
 // first-person controller. WASD in camera-local space, y locked to eye height,
 // x/z clamped to room bounds (room is 20x20 centered at origin → walls at +-10,
@@ -23,13 +25,28 @@ export function PlayerController() {
   const forward = useRef(new Vector3());
   const right = useRef(new Vector3());
   const move = useRef(new Vector3());
+  const { typing } = useTyping();
+  const typingRef = useRef(typing);
+  typingRef.current = typing;
 
   useEffect(() => {
     camera.position.set(0, EYE_HEIGHT, 5);
   }, [camera]);
 
+  // when typing flips on, clear any held keys so the player doesn't drift.
+  useEffect(() => {
+    if (typing) {
+      keys.current.forward = false;
+      keys.current.back = false;
+      keys.current.left = false;
+      keys.current.right = false;
+    }
+  }, [typing]);
+
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
+      // suppress while typing in chat / dialogue modal.
+      if (typingRef.current) return;
       switch (e.code) {
         case "KeyW":
         case "ArrowUp":
@@ -50,6 +67,8 @@ export function PlayerController() {
       }
     }
     function onKeyUp(e: KeyboardEvent) {
+      // we still want to release on keyup even if typing started mid-press,
+      // otherwise the player would walk forever after closing chat.
       switch (e.code) {
         case "KeyW":
         case "ArrowUp":
@@ -114,6 +133,11 @@ export function PlayerController() {
     camera.position.x = Math.max(-BOUND, Math.min(BOUND, camera.position.x));
     camera.position.z = Math.max(-BOUND, Math.min(BOUND, camera.position.z));
     camera.position.y = EYE_HEIGHT;
+
+    // publish to the cross-Canvas store so DOM (livekit broadcast) + scene
+    // (proximity check for NPCDialogue) can read player pose.
+    const yaw = Math.atan2(forward.current.x, forward.current.z);
+    playerPosStore.set({ x: camera.position.x, z: camera.position.z, rot: yaw });
   });
 
   return <PointerLockControls />;

@@ -1,8 +1,11 @@
 import type { ReactElement } from "react";
+import { useEffect, useMemo } from "react";
 import { BRAND, SPECIES_DESK } from "@mimi/types";
 import type { Species } from "@mimi/types";
 import { AgentBillboard } from "../components/AgentBillboard";
 import { PlayerController } from "../components/PlayerController";
+import { RemotePeers } from "../components/RemotePeers";
+import { playerPosStore, useMimiRoomContext } from "../lib/room-context";
 
 // brand-locked palette + a few warm accent tones used only for physical props
 // inside the room (plant green, monitor glow). chibi color lives on the sprites.
@@ -29,7 +32,24 @@ const AGENT_NAMES: Record<Species, string> = {
   giraffe: "giraffe",
 };
 
-export function Room() {
+interface RoomProps {
+  localIdentity: string;
+}
+
+export function Room({ localIdentity }: RoomProps) {
+  const { peers } = useMimiRoomContext();
+
+  // which species are "live" — meaning at least one agent broadcast has
+  // arrived for them. for those we skip the static placeholder and let
+  // RemotePeers render the real, state-driven billboard instead.
+  const liveAgentSpecies = useMemo(() => {
+    const set = new Set<Species>();
+    for (const peer of peers.values()) {
+      if (peer.kind === "agent" && peer.species) set.add(peer.species);
+    }
+    return set;
+  }, [peers]);
+
   return (
     <>
       {/* lighting — warm directional + soft paper ambient, shadows on */}
@@ -76,41 +96,69 @@ export function Room() {
       <BunnyCorner pos={SPECIES_DESK.bunny} />
       <GiraffeCorner pos={SPECIES_DESK.giraffe} />
 
-      {/* placeholder agents at their desks. real state arrives from livekit. */}
-      <AgentBillboard
-        species="tiger"
-        state="idle"
-        name={AGENT_NAMES.tiger}
-        position={[SPECIES_DESK.tiger[0] + 1.2, 0, SPECIES_DESK.tiger[1] + 1.2]}
-      />
-      <AgentBillboard
-        species="otter"
-        state="idle"
-        name={AGENT_NAMES.otter}
-        position={[SPECIES_DESK.otter[0] - 1.2, 0, SPECIES_DESK.otter[1] + 1.2]}
-      />
-      <AgentBillboard
-        species="bunny"
-        state="idle"
-        name={AGENT_NAMES.bunny}
-        position={[SPECIES_DESK.bunny[0] + 1.2, 0, SPECIES_DESK.bunny[1] - 1.2]}
-      />
-      <AgentBillboard
-        species="giraffe"
-        state="idle"
-        name={AGENT_NAMES.giraffe}
-        position={[SPECIES_DESK.giraffe[0] - 1.2, 0, SPECIES_DESK.giraffe[1] - 1.2]}
-      />
-      <AgentBillboard
-        species="dog"
-        state="idle"
-        name={AGENT_NAMES.dog}
-        position={[SPECIES_DESK.dog[0], 0, SPECIES_DESK.dog[1]]}
-      />
+      {/* placeholder agents — only render when no live broadcast for that species. */}
+      {!liveAgentSpecies.has("tiger") ? (
+        <AgentBillboard
+          species="tiger"
+          state="idle"
+          name={AGENT_NAMES.tiger}
+          position={[SPECIES_DESK.tiger[0] + 1.2, 0, SPECIES_DESK.tiger[1] + 1.2]}
+        />
+      ) : null}
+      {!liveAgentSpecies.has("otter") ? (
+        <AgentBillboard
+          species="otter"
+          state="idle"
+          name={AGENT_NAMES.otter}
+          position={[SPECIES_DESK.otter[0] - 1.2, 0, SPECIES_DESK.otter[1] + 1.2]}
+        />
+      ) : null}
+      {!liveAgentSpecies.has("bunny") ? (
+        <AgentBillboard
+          species="bunny"
+          state="idle"
+          name={AGENT_NAMES.bunny}
+          position={[SPECIES_DESK.bunny[0] + 1.2, 0, SPECIES_DESK.bunny[1] - 1.2]}
+        />
+      ) : null}
+      {!liveAgentSpecies.has("giraffe") ? (
+        <AgentBillboard
+          species="giraffe"
+          state="idle"
+          name={AGENT_NAMES.giraffe}
+          position={[SPECIES_DESK.giraffe[0] - 1.2, 0, SPECIES_DESK.giraffe[1] - 1.2]}
+        />
+      ) : null}
+      {!liveAgentSpecies.has("dog") ? (
+        <AgentBillboard
+          species="dog"
+          state="idle"
+          name={AGENT_NAMES.dog}
+          position={[SPECIES_DESK.dog[0], 0, SPECIES_DESK.dog[1]]}
+        />
+      ) : null}
+
+      {/* real remote peers — humans + agents — rendered with smooth lerp. */}
+      <RemotePeers localIdentity={localIdentity} />
 
       <PlayerController />
+      <PresencePump localIdentity={localIdentity} />
     </>
   );
+}
+
+// inside-canvas helper that pulls the player's pose from the store and pushes
+// it to the livekit hook's publishLocalPos. PlayerController writes to
+// playerPosStore every frame; this just forwards each tick to the hook, which
+// throttles the actual wire broadcasts internally.
+function PresencePump({ localIdentity: _localIdentity }: { localIdentity: string }) {
+  const { publishLocalPos } = useMimiRoomContext();
+  useEffect(() => {
+    return playerPosStore.subscribe((p) => {
+      publishLocalPos({ x: p.x, z: p.z, rot: p.rot });
+    });
+  }, [publishLocalPos]);
+  return null;
 }
 
 function Wall({
