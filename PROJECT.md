@@ -18,7 +18,7 @@ A blueprint-navigable agent house. You see a top-down map of a cute "house" with
 
 **Oversight character**: at the center of the house (Harry Potter bank manager / goblin king energy). The mimi. agent itself. It dispatches. It coordinates. It's the only one who sees everything.
 
-**Sprites**: chibi LITTLE ANIMALS (cats per the sticker sheet references). NOT human chibis. Animal Crossing villager DNA. Round, soft, expressive.
+**Sprites**: chibi LITTLE ANIMALS — diverse roster, NOT all the same species. Roster: dog, giraffe, tiger, bunny, otter (extensible). Each AGENT gets a different species. Animal Crossing villager DNA. Round, soft, expressive. The species + the cubicle theming together signal what the agent does.
 
 **Reference images in maddy's doc**:
 - House: the minecraft-trading-post yellow/white/red building
@@ -52,14 +52,14 @@ A blueprint-navigable agent house. You see a top-down map of a cute "house" with
 
 Each agent owns one external data source + one cubicle. Minimum viable house has these agents:
 
-1. **the github agent** — watches PRs, commits, issues. Cubicle: code monitors, hoodie. Voice cluster: dry/technical.
-2. **the email agent** — watches gmail. Cubicle: envelopes, typewriter. Voice cluster: warm/professional.
-3. **the calendar agent** — watches calendar invites. Cubicle: planners, clocks. Voice cluster: chipper/efficient.
-4. **mimi.** (the oversight) — sits at the center. Doesn't watch a source — watches the other agents. Coordinates dispatch. The "head of bank." Voice cluster: warm/leader.
+1. **the github agent — TIGER** 🐯. Watches PRs, commits, issues. Cubicle: code monitors, hoodie on the chair, striped rug. Voice cluster: dry/technical.
+2. **the email agent — OTTER** 🦦. Watches gmail. Cubicle: stacked envelopes, typewriter, water cooler. Voice cluster: warm/social.
+3. **the calendar agent — BUNNY** 🐰. Watches calendar invites. Cubicle: planners, clocks, carrot pen. Voice cluster: chipper/punctual.
+4. **mimi. (the oversight) — DOG** 🐕. Sits at the center. Watches the other agents. Coordinates dispatch. Golden retriever wisdom energy / head-of-bank vibe. Voice cluster: warm/leader.
 
 If time permits in build:
-5. **the linear agent** — watches tickets. Cubicle: post-it notes, sprint boards.
-6. **the meeting notes agent** — watches notion's `/v1/blocks/meeting_notes/query`. Cubicle: a microphone, a notebook.
+5. **the meeting notes agent — GIRAFFE** 🦒. Watches notion's `/v1/blocks/meeting_notes/query`. Cubicle: tall mic, stacked notebooks. Voice cluster: thoughtful/observant.
+6. **the linear agent — (TBD)** — watches tickets. Cubicle: post-it notes, sprint board.
 
 ---
 
