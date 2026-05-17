@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+    "baseUrl": ".",
+    "paths": {
+      "@mimi/types": ["./packages/types/src/index.ts"],
+      "@mimi/types/*": ["./packages/types/src/*"],
+      "@mimi/notion-client": ["./packages/notion-client/src/index.ts"],
+      "@mimi/notion-client/*": ["./packages/notion-client/src/*"],
+      "@mimi/animalese": ["./packages/animalese/src/index.ts"],
+      "@mimi/animalese/*": ["./packages/animalese/src/*"]
+    }
+  }
+}

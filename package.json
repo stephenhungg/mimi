@@ -1,0 +1,31 @@
+{
+  "name": "mimi",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "agents/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "bun --cwd apps/web dev",
+    "dev:landing": "bun --cwd apps/landing dev",
+    "dev:tiger": "bun --cwd agents/runtime dev -- --persona tiger",
+    "dev:otter": "bun --cwd agents/runtime dev -- --persona otter",
+    "dev:bunny": "bun --cwd agents/runtime dev -- --persona bunny",
+    "dev:dog": "bun --cwd agents/runtime dev -- --persona dog",
+    "dev:all": "concurrently -n web,landing,tiger,dog \"bun run dev:web\" \"bun run dev:landing\" \"bun run dev:tiger\" \"bun run dev:dog\"",
+    "typecheck": "bun --cwd packages/types tsc --noEmit && bun --cwd packages/notion-client tsc --noEmit && bun --cwd packages/animalese tsc --noEmit && bun --cwd apps/web tsc --noEmit && bun --cwd apps/landing tsc --noEmit && bun --cwd agents/runtime tsc --noEmit",
+    "provision:notion": "bun scripts/provision-notion-dbs.ts",
+    "seed:demo": "bun scripts/seed-demo.ts"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "bun": ">=1.1.0",
+    "node": ">=22.0.0"
+  }
+}

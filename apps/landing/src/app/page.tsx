@@ -159,14 +159,18 @@ export default function Home() {
         start: "top 82%",
         once: true,
         onEnter: (batch) => {
-          gsap.to(batch, {
-            opacity: 1,
-            y: 0,
-            duration: 1,
-            stagger: 0.08,
-            ease: "expo.out",
-            overwrite: true
-          });
+          gsap.fromTo(
+            batch,
+            { opacity: 0.001, y: 48 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 1,
+              stagger: 0.08,
+              ease: "expo.out",
+              overwrite: true
+            }
+          );
         }
       });
 
@@ -224,7 +228,7 @@ export default function Home() {
 
 function Nav() {
   return (
-    <nav className="motion-nav mix-difference fixed left-1/2 top-0 z-40 flex w-full items-center justify-between p-4 font-inter text-[10.8px] font-semibold uppercase leading-[1.2] text-agents-white md:text-lg">
+    <nav className="motion-nav mix-difference fixed left-1/2 top-0 z-40 flex w-full items-center justify-between p-4 font-inter text-[10.8px] font-semibold uppercase leading-[12.96px] text-agents-white md:text-[18px] md:leading-[21.6px]">
       <a href="#" className="tracking-normal">
         agents
       </a>
@@ -258,7 +262,7 @@ function Hero() {
       </div>
 
       <div className="mix-difference relative flex flex-1 items-center justify-center overflow-hidden p-4">
-        <p className="motion-copy max-w-[320px] font-display text-[14.4px] font-semibold uppercase leading-[1.2] text-agents-white md:max-w-[400px] md:text-2xl">
+        <p className="motion-copy max-w-[320px] font-display text-[14.4px] font-semibold uppercase leading-[17.28px] text-agents-white md:max-w-[400px] md:text-[24px] md:leading-[28.8px]">
           a creative agency specializing in design, art direction, and branding
           — crafting visuals that connect brands with their audience.
         </p>
@@ -298,7 +302,7 @@ function FeaturedWork() {
                 <img className="h-full w-full object-cover" src={item.insetImage} alt="" />
               )}
             </div>
-            <div className="absolute inset-x-0 bottom-0 flex flex-col p-2 font-display text-[14.4px] font-semibold uppercase leading-[1.2] text-agents-white md:text-2xl">
+            <div className="absolute inset-x-0 bottom-0 flex flex-col p-2 font-display text-[14.4px] font-semibold uppercase leading-[17.28px] text-agents-white md:text-[24px] md:leading-[28.8px]">
               <span>{item.label}</span>
               <span>{item.type}</span>
             </div>
@@ -306,11 +310,13 @@ function FeaturedWork() {
         ))}
       </div>
 
-      <div className="reveal-up flex max-w-[400px] flex-col font-display text-[14.4px] font-semibold uppercase leading-[1.2] text-agents-white md:text-2xl">
-        <p>from concept to execution, every detail matters—</p>
-        <a className="text-agents-gray" href="#">
-          see all works
-        </a>
+      <div className="reveal-up max-w-[400px] font-display text-[14.4px] font-semibold uppercase leading-[17.28px] text-agents-white md:text-[24px] md:leading-[28.8px]">
+        <p>
+          from concept to execution, every detail matters—
+          <a className="text-agents-gray" href="#">
+            see all works
+          </a>
+        </p>
       </div>
     </section>
   );
@@ -337,7 +343,7 @@ function Services({
       </div>
 
       <div className="ml-auto flex w-[75%] max-w-[704px] flex-col p-4 md:w-[50%]">
-        <h2 className="reveal-up mb-4 font-display text-[14.4px] font-semibold uppercase leading-[1.2] tracking-[-0.04em] text-agents-white md:text-2xl">
+        <h2 className="reveal-up mb-4 font-display text-[14.4px] font-semibold uppercase leading-[17.28px] tracking-[-0.04em] text-agents-white md:text-[24px] md:leading-[28.8px]">
           [ services ]
         </h2>
         <div className="flex flex-col gap-1">
@@ -363,7 +369,7 @@ function Clients() {
   return (
     <section className="relative flex min-h-[511px] flex-col gap-[95px] px-4 py-32 md:min-h-[657px]">
       <div className="flex flex-col overflow-hidden">
-        <h2 className="reveal-up mb-4 font-display text-[14.4px] font-semibold uppercase leading-[1.2] tracking-[-0.04em] text-agents-white md:text-2xl">
+        <h2 className="reveal-up mb-4 font-display text-[14.4px] font-semibold uppercase leading-[17.28px] tracking-[-0.04em] text-agents-white md:text-[24px] md:leading-[28.8px]">
           [ selected clients ]
         </h2>
         <div className="flex flex-col gap-1">
@@ -391,7 +397,7 @@ function FinalSection() {
         className="absolute right-4 top-32 h-[83px] w-[147px] object-cover md:left-[39.8%] md:top-10 md:h-[360px] md:w-[640px]"
         src={media.heroVideo}
       />
-      <div className="relative flex flex-col font-display text-2xl font-semibold uppercase leading-none text-agents-white md:text-[40px]">
+      <div className="relative flex flex-col font-display text-[24px] font-semibold uppercase leading-[24px] text-agents-white md:text-[40px] md:leading-[40px]">
         <p className="reveal-up md:ml-[26.35%]">driven by ideas</p>
         <p className="reveal-up">— defined by details</p>
       </div>
@@ -406,12 +412,12 @@ function Footer() {
       className="relative overflow-hidden bg-agents-black px-4 pb-0 pt-32"
     >
       <div className="grid gap-8 md:grid-cols-2">
-        <p className="reveal-up max-w-[480px] font-display text-2xl font-semibold uppercase leading-none text-agents-white md:text-[40px]">
+        <p className="reveal-up max-w-[480px] font-display text-[24px] font-semibold uppercase leading-[24px] text-agents-white md:text-[40px] md:leading-[40px]">
           let´s build something different
         </p>
 
         <div className="reveal-up flex flex-col gap-2">
-          <h2 className="font-inter text-[10.8px] font-semibold uppercase leading-[1.2] text-agents-white md:text-lg">
+          <h2 className="font-inter text-[10.8px] font-semibold uppercase leading-[12.96px] text-agents-white md:text-[18px] md:leading-[21.6px]">
             reach out
           </h2>
           <div className="flex flex-col gap-0.5 font-display text-[33.6px] font-bold uppercase leading-none tracking-[-0.02em] md:text-[56px]">
@@ -423,19 +429,21 @@ function Footer() {
           </div>
         </div>
 
-        <div className="reveal-up mt-8 flex flex-col gap-8 font-inter text-[10.8px] font-semibold uppercase leading-[1.2] text-agents-white md:text-lg">
+        <div className="reveal-up mt-8 flex flex-col gap-8 font-inter text-[10.8px] font-semibold uppercase leading-[12.96px] text-agents-white md:text-[18px] md:leading-[21.6px]">
           <div className="flex flex-col gap-1">
             <a href="#">buy template</a>
             <a href="#">made in framer</a>
             <a href="#">by jean</a>
           </div>
           <div className="flex flex-col gap-1">
-            <time className="font-display leading-none">20:24</time>
+            <time className="font-display text-[10.8px] leading-[10.8px] md:text-[18px] md:leading-[18px]">
+              20:24
+            </time>
             <span>montevideo-uy</span>
           </div>
         </div>
 
-        <div className="reveal-up mt-8 flex flex-col font-inter text-[10.8px] font-semibold uppercase leading-[1.2] text-agents-white md:self-end md:text-lg">
+        <div className="reveal-up mt-8 flex flex-col font-inter text-[10.8px] font-semibold uppercase leading-[12.96px] text-agents-white md:self-end md:text-[18px] md:leading-[21.6px]">
           <span>©2025</span>
           <span>all rights reserved</span>
         </div>

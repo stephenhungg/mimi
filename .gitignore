@@ -1,8 +1,21 @@
+# env
 .env
 .env.local
+.env.*.local
+
+# deps + build
 node_modules/
 dist/
+build/
+.next/
+out/
+.turbo/
+.cache/
+
+# bun + npm
+*.tsbuildinfo
+
+# misc
 .DS_Store
 *.log
 .wrangler/
-

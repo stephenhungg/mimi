@@ -103,8 +103,7 @@ video {
 }
 
 .reveal-up {
-  opacity: 0;
-  transform: translate3d(0, 48px, 0);
+  will-change: transform, opacity;
 }
 
 .work-card img,
