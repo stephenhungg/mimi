@@ -13,21 +13,23 @@ This is the visual ground truth. Every asset reuses these specs. No new mascots,
 
 The other agent species (tiger, otter, bunny, giraffe) are supporting cast — they appear in the workspace but the dog/retriever is the brand mark.
 
-## Palette (locked hexes — MONOCHROME)
+## Palette (locked hexes — ASPHALT + PAPER)
 
 ```
-paper:       #FAFAFA   (off-white page surface, just a tick warmer than pure white)
-cloud:       #FFFFFF   (pure white, for cards / fills)
-soft:        #F2F2F2   (subtle gray surface, hover background)
-hairline:    #E5E5E5   (soft border line)
-muted:       #6B6B6B   (readable medium-gray body text)
-ink:         #0F0F0F   (deep black, all outlines and headings)
-accent-100:  #E5E5E5   (very pale gray)
-accent-300:  #9C9C9C   (mid gray)
-accent-500:  #0F0F0F   (primary "accent" — just black)
-accent-700:  #000000   (pure black for shadow offsets)
-shadow:      #0F0F0F   (sticker offset shadow color = black)
+paper:       #EFEDE3   (warm off-white, cream undertone — page surface)
+cloud:       #F7F5EE   (lighter paper variant for cards)
+soft:        #E5E2D5   (subtle warm gray surface, hover background)
+hairline:    #D6D2C3   (soft warm border line)
+muted:       #6B665C   (readable warm-gray body text)
+ink:         #302F2C   (asphalt — warm near-black, olive undertone, all outlines and headings)
+accent-100:  #E5E2D5   (very pale warm gray)
+accent-300:  #8F8B7E   (mid warm gray)
+accent-500:  #302F2C   (primary "accent" — asphalt)
+accent-700:  #1F1E1B   (deeper asphalt for shadow offsets)
+shadow:      #302F2C   (asphalt offset shadow)
 ```
+
+The brand sits on warm paper, drawn in asphalt ink. Both colors have undertone — paper has cream warmth, asphalt has olive depth. Never pure white, never pure black. This warmth is what makes the kawaii chibis feel right when drawn in monochrome.
 
 Roles:
 - backgrounds → paper (off-white)
