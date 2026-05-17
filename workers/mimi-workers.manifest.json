@@ -1,0 +1,35 @@
+{
+  "$comment": "mimi. monorepo worker registry. workers/workers.json is gitignored by the notion CLI (it contains tenant-specific workspaceId/workerId), so we commit this manifest instead. used by docs + deploy scripts to enumerate workers.",
+  "workers": [
+    {
+      "name": "mimi-events",
+      "entry": "mimi-events/index.ts",
+      "description": "central event ingestion + agent fan-out"
+    },
+    {
+      "name": "mimi-github-bridge",
+      "entry": "mimi-github-bridge/index.ts",
+      "description": "github webhook receiver (HMAC verified)"
+    },
+    {
+      "name": "mimi-overnight-pulse",
+      "entry": "mimi-overnight-pulse/index.ts",
+      "description": "30-min agent pacing pulse"
+    },
+    {
+      "name": "mimi-thumbnail-render",
+      "entry": "mimi-thumbnail-render/index.ts",
+      "description": "live SVG pixel-art thumbnail of the room"
+    },
+    {
+      "name": "mimi-mcp-server",
+      "entry": "mimi-mcp-server/index.ts",
+      "description": "MCP server exposing mimi. tools to any external AI"
+    },
+    {
+      "name": "mimi-notion-agents",
+      "entry": "mimi-notion-agents/index.ts",
+      "description": "sponsor flex: wraps the official notion-agents-sdk-js so mimi. can summon notion-hosted custom agents"
+    }
+  ]
+}

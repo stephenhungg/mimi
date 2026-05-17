@@ -36,6 +36,10 @@ format: **<topic>** — what to do / what not to do. **why:** the reason. **how 
 **why:** strict ts blocked the build at notion-client wave 0.
 **how to apply:** when passing dynamic emoji to notion blocks, cast: `icon: { type: "emoji", emoji: myEmoji as any }`. document the as-any with a comment.
 
+**`notion-agents-sdk-js` is published as `@notionhq/agents-client` ONLY on github (not npm), and ships source-only (`private: true`, no `dist/`).** install with `"@notionhq/agents-client": "github:makenotion/notion-agents-sdk-js"` and add a `postinstall` hook that does `npm install && npm run build` inside the package so tsc can resolve `.d.ts` files.
+**why:** `npm view notion-agents-sdk-js` returns 404 — the repo's package.json sets `private: true` so it's not on the registry. installing from github gives raw source with no compiled output, so type imports fail until the SDK is built. tried this for the mimi-notion-agents worker (step 1 of the sponsor flex) — postinstall build path worked first try; typecheck passed clean across all 6 workers.
+**how to apply:** any time you depend on a public github sdk that isn't on npm, check `node_modules/<pkg>/dist/` after install. if missing, add postinstall: `node -e "...if (!fs.existsSync(p+'/dist')) execSync('npm install --no-save && npm run build', {cwd: p})"`. avoids vendoring source or forking the repo.
+
 **bun add in a workspace root installs to root by default — pass `--cwd <pkg>` or run inside the package dir to land it in the workspace's package.json.**
 **why:** lost a minute installing livekit-server-sdk into the root by accident, had to remove + reinstall.
 **how to apply:** always check `bun pm ls` or grep the resulting package.json after install.

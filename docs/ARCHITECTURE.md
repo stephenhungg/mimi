@@ -99,6 +99,7 @@ deployed via `ntn workers deploy --name <worker>`. cloudflare-workers-style runt
 | `mimi-overnight-pulse` | periodic ping (every 30 min) → agents journal + pace the room |
 | `mimi-thumbnail-render`| renders the room thumbnail as svg (cached 5s) |
 | `mimi-mcp-server`      | exposes mimi. as an MCP server — `list_residents`, `recent_events`, `summon_agent`, `read_agent_memory`, `append_event` |
+| `mimi-notion-agents`   | sponsor flex — wraps `@notionhq/agents-client` so mimi. can summon notion-hosted custom agents alongside its own claude runtimes |
 
 ## the broadcast contract
 
@@ -116,11 +117,29 @@ type Broadcast =
 
 agents publish via `livekit-server-sdk`'s `RoomServiceClient.sendData` (server-side, no participant connection needed). web clients publish via `LocalParticipant.publishData`. all clients in the room receive everything.
 
+## notion agent sdk integration (sponsor flex)
+
+mimi. is the only demo that runs **both** agent surfaces side by side:
+
+- **layer B (our own claude runtimes)** — `agents/runtime` spawns one bun process per species; each loop calls anthropic + emits tool calls that drive the 3D world via livekit.
+- **layer C (notion-hosted custom agents)** — `workers/mimi-notion-agents` wraps the official [`notion-agents-sdk-js`](https://github.com/makenotion/notion-agents-sdk-js) (`@notionhq/agents-client`) and exposes two tools the rest of the room can call:
+  - `list_notion_agents()` → every custom agent in the workspace (`client.agents.list`)
+  - `summon_notion_agent({ agentId, message })` → `agent.chat()` → `pollThread()` → `listMessages()` → returns the agent's final reply text
+
+at demo time, mimi (the dog) can dispatch a notion-hosted custom agent to help triage — "mimi calls in a hosted notion agent for a second opinion" — and the result lands back in the events db like any other broadcast. zero-config from the agent runtime's perspective: it just calls one more worker tool.
+
+### install / wiring notes
+
+- the sdk ships as `@notionhq/agents-client` in the github repo but is marked `private: true`, so it isn't published to npm. workers pins it as `github:makenotion/notion-agents-sdk-js` and a `postinstall` hook in `workers/package.json` runs `npm install && npm run build` inside the SDK so its `dist/` exists for tsc to resolve types against.
+- the SDK extends `@notionhq/client`'s `Client` and uses standard `fetch`, so it runs cleanly inside the notion workers runtime — no node-only APIs required.
+- `chat()` returns immediately with `{ status: "pending" }`; the worker polls with `agent.pollThread()` (exponential backoff, 30 attempts) then reads back via `agent.thread(id).listMessages()` for the final agent message.
+
 ## sponsor alignment (why this is the killer app for notion's dev platform)
 
 - **5 dbs** modeled cleanly with consistent semantic types
-- **4 workers + MCP server** = 5 worker-shaped pieces touching the platform
+- **6 workers** (events, github-bridge, overnight-pulse, thumbnail-render, mcp-server, notion-agents) all touching the platform
 - **dual-direction sync**: workers write notion ↔ agents read notion ↔ external agents read mimi via MCP
+- **only entry using BOTH agent surfaces**: hand-rolled claude runtimes AND notion-hosted custom agents (via `notion-agents-sdk-js`) in the same room
 - **meeting-notes endpoint** consumed by giraffe agent
 - **notion-as-thumbnail**: the dashboard surface IS a notion page. live svg embedded as image. zero custom UI on notion's side.
 

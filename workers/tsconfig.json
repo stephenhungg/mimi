@@ -18,6 +18,7 @@
 		"mimi-overnight-pulse/**/*.ts",
 		"mimi-thumbnail-render/**/*.ts",
 		"mimi-mcp-server/**/*.ts",
+		"mimi-notion-agents/**/*.ts",
 		"_shared/**/*.ts"
 	],
 	"exclude": ["node_modules", "dist", ".examples"]
