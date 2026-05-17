@@ -101,6 +101,51 @@ export class AgentRuntime {
       console.warn(`[${this.identity}] join event log failed:`, err);
     }
     console.log(`[${this.identity}] online — species=${this.species} watches=${this.persona.watches} model=${this.model}`);
+    // mimi (the dog) runs a periodic dispatch loop on top of the normal /event loop:
+    // every 30s, she reads the last 2 min of events from notion and decides whether
+    // to speak a dispatch line. this is what makes her feel like the room's coordinator.
+    if (this.identity === "mimi") this.startDispatchLoop();
+  }
+
+  // mimi-only oversight loop. polls events db, asks claude (with persona) whether
+  // anything warrants a dispatch line right now. if yes, calls handleEvent with a
+  // synthetic manual.poke so the normal tool-use loop drives walk_to + speak.
+  // safe to no-op when nothing's happening — keeps token use low.
+  private startDispatchLoop(): void {
+    const TICK_MS = 30_000;
+    const tick = async () => {
+      if (this.isDown().down) return;
+      try {
+        const events = await this.notion.queryRecentEvents(8);
+        const cutoff = Date.now() - 2 * 60 * 1000;
+        const recent = events.filter((e) => new Date(e.ts).getTime() >= cutoff);
+        if (recent.length === 0) return; // quiet room, nothing to say
+        const summary = recent
+          .map((e) => `- [${e.ts}] ${e.agent ?? "?"}: ${e.summary}`)
+          .join("\n");
+        const synthetic: ExternalEvent = {
+          id: `dispatch-${Date.now()}`,
+          source: "manual",
+          type: "manual.poke",
+          ts: new Date().toISOString(),
+          payload: {
+            kind: "dispatch_check",
+            roster: ["tiger", "otter", "bunny", "giraffe"],
+            recent_events: summary,
+            note: "you're mimi, the oversight. decide if any of this warrants a one-line dispatch to the team. if nothing needs you, call reset_pose and stay quiet. don't speak unless it adds signal.",
+          },
+        };
+        await this.handleEvent(synthetic);
+      } catch (err) {
+        console.warn(`[mimi] dispatch tick failed:`, err);
+      }
+    };
+    // first tick after 10s so we don't talk before agents have joined.
+    setTimeout(() => {
+      tick().catch(() => {});
+      setInterval(() => tick().catch(() => {}), TICK_MS);
+    }, 10_000);
+    console.log(`[mimi] dispatch loop armed (every ${TICK_MS}ms)`);
   }
 
   isDown(): { down: boolean; until?: number; reason?: string } {
