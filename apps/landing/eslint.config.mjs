@@ -10,6 +10,16 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig([
   {
+    plugins: {
+      "@next/next": nextPlugin
+    },
+    rules: {
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs["core-web-vitals"].rules,
+      "@next/next/no-img-element": "off"
+    }
+  },
+  {
     files: ["src/**/*.{ts,tsx}", "tailwind.config.ts"],
     languageOptions: {
       parser: tsParser,
@@ -30,13 +40,7 @@ export default defineConfig([
       }
     },
     plugins: {
-      "@next/next": nextPlugin,
       "@typescript-eslint": tsPlugin
-    },
-    rules: {
-      ...nextPlugin.configs.recommended.rules,
-      ...nextPlugin.configs["core-web-vitals"].rules,
-      "@next/next/no-img-element": "off"
     }
   },
   globalIgnores([".next/**", "node_modules/**", "next-env.d.ts"])

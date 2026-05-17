@@ -110,10 +110,12 @@ const clients = [
 function LoopVideo({
   src,
   poster,
+  autoPlay = true,
   className
 }: {
   src: string;
   poster?: string;
+  autoPlay?: boolean;
   className?: string;
 }) {
   return (
@@ -121,7 +123,7 @@ function LoopVideo({
       className={className}
       src={src}
       poster={poster}
-      autoPlay
+      autoPlay={autoPlay}
       muted
       loop
       playsInline
@@ -137,9 +139,14 @@ export default function Home() {
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
+      const cleanup: Array<() => void> = [];
+
+      gsap.set(".work-inset", { autoAlpha: 0, scale: 0.94 });
+      gsap.set(".client-mark", { autoAlpha: 0, scale: 0.7, width: 0 });
+      gsap.set(".final-video", { autoAlpha: 0, y: 48 });
 
       gsap
-        .timeline({ defaults: { duration: 1, ease: "expo.out" } })
+        .timeline({ defaults: { duration: 1.05, ease: "expo.out" } })
         .to(".motion-nav", { opacity: 1, y: 0 }, 0)
         .to(".motion-title", { opacity: 1, y: 0 }, 0.05)
         .to(".motion-copy", { opacity: 1 }, 0.5);
@@ -175,12 +182,68 @@ export default function Home() {
       });
 
       gsap.utils.toArray<HTMLElement>(".work-card").forEach((card) => {
-        const targets = card.querySelectorAll("img, video");
-        card.addEventListener("mouseenter", () => {
-          gsap.to(targets, { scale: 1.035, duration: 0.8, ease: "expo.out" });
+        const baseMedia = card.querySelectorAll<HTMLElement>(":scope > img, :scope > video");
+        const inset = card.querySelector<HTMLElement>(".work-inset");
+        const insetVideo = inset?.querySelector("video");
+        const onEnter = () => {
+          insetVideo?.play().catch(() => undefined);
+          gsap.to(baseMedia, { scale: 1.035, duration: 0.9, ease: "expo.out" });
+          gsap.to(inset, {
+            autoAlpha: 1,
+            scale: 1,
+            duration: 0.65,
+            ease: "expo.out",
+            overwrite: true
+          });
+        };
+        const onLeave = () => {
+          insetVideo?.pause();
+          gsap.to(baseMedia, { scale: 1, duration: 0.9, ease: "expo.out" });
+          gsap.to(inset, {
+            autoAlpha: 0,
+            scale: 0.94,
+            duration: 0.55,
+            ease: "expo.out",
+            overwrite: true
+          });
+        };
+
+        card.addEventListener("mouseenter", onEnter);
+        card.addEventListener("mouseleave", onLeave);
+        cleanup.push(() => {
+          card.removeEventListener("mouseenter", onEnter);
+          card.removeEventListener("mouseleave", onLeave);
         });
-        card.addEventListener("mouseleave", () => {
-          gsap.to(targets, { scale: 1, duration: 0.8, ease: "expo.out" });
+      });
+
+      gsap.utils.toArray<HTMLElement>(".client-row").forEach((row) => {
+        const mark = row.querySelector<HTMLElement>(".client-mark");
+        const onEnter = () => {
+          gsap.to(mark, {
+            autoAlpha: 1,
+            scale: 1,
+            width: 32,
+            duration: 0.45,
+            ease: "expo.out",
+            overwrite: true
+          });
+        };
+        const onLeave = () => {
+          gsap.to(mark, {
+            autoAlpha: 0,
+            scale: 0.7,
+            width: 0,
+            duration: 0.4,
+            ease: "expo.out",
+            overwrite: true
+          });
+        };
+
+        row.addEventListener("mouseenter", onEnter);
+        row.addEventListener("mouseleave", onLeave);
+        cleanup.push(() => {
+          row.removeEventListener("mouseenter", onEnter);
+          row.removeEventListener("mouseleave", onLeave);
         });
       });
 
@@ -192,6 +255,18 @@ export default function Home() {
           onEnter: () => setActiveService(index),
           onEnterBack: () => setActiveService(index)
         });
+      });
+
+      gsap.to(".final-video", {
+        autoAlpha: 1,
+        y: 0,
+        duration: 1,
+        ease: "expo.out",
+        scrollTrigger: {
+          trigger: ".final-section",
+          start: "top 68%",
+          toggleActions: "play none none reverse"
+        }
       });
 
       mm.add("(min-width: 810px)", () => {
@@ -207,7 +282,10 @@ export default function Home() {
         });
       });
 
-      return () => mm.revert();
+      return () => {
+        cleanup.forEach((remove) => remove());
+        mm.revert();
+      };
     },
     { scope: root }
   );
@@ -256,7 +334,7 @@ function Hero() {
           alt=""
         />
         <LoopVideo
-          className="hero-media absolute inset-0 h-full w-full object-cover opacity-70 mix-blend-screen"
+          className="hero-media absolute inset-0 h-full w-full object-cover opacity-80"
           src={media.heroVideo}
         />
       </div>
@@ -291,12 +369,13 @@ function FeaturedWork() {
             className={`work-card reveal-up relative isolate block overflow-hidden ${item.ratio}`}
           >
             <img className="absolute inset-0 h-full w-full object-cover" src={item.image} alt="" />
-            <div className="absolute inset-[20%] overflow-hidden">
+            <div className="work-inset absolute inset-[20%] overflow-hidden">
               {item.insetVideo ? (
                 <LoopVideo
                   className="h-full w-full object-cover"
                   src={item.insetVideo}
                   poster={item.insetPoster}
+                  autoPlay={false}
                 />
               ) : (
                 <img className="h-full w-full object-cover" src={item.insetImage} alt="" />
@@ -376,12 +455,12 @@ function Clients() {
           {clients.map((client, index) => (
             <div
               key={client.name}
-              className={`reveal-up flex h-[34px] items-center gap-4 overflow-visible font-display text-[33.6px] font-bold uppercase leading-none tracking-[-0.02em] md:h-14 md:text-[56px] ${
+              className={`client-row reveal-up flex h-[34px] items-center gap-4 overflow-visible font-display text-[33.6px] font-bold uppercase leading-none tracking-[-0.02em] md:h-14 md:text-[56px] ${
                 index === clients.length - 1 ? "text-agents-white" : "text-agents-gray"
               }`}
             >
               <span>{client.name}</span>
-              <img className="h-8 w-8 object-contain" src={client.mark} alt="" />
+              <img className="client-mark h-8 object-contain" src={client.mark} alt="" />
             </div>
           ))}
         </div>
@@ -392,10 +471,11 @@ function Clients() {
 
 function FinalSection() {
   return (
-    <section className="relative flex min-h-[363px] flex-col justify-center overflow-clip px-4 py-32 md:min-h-[476px]">
+    <section className="final-section relative flex min-h-[363px] flex-col justify-center overflow-clip px-4 py-32 md:min-h-[476px]">
       <LoopVideo
-        className="absolute right-4 top-32 h-[83px] w-[147px] object-cover md:left-[39.8%] md:top-10 md:h-[360px] md:w-[640px]"
+        className="final-video absolute right-4 top-32 h-[83px] w-[147px] object-cover md:left-[39.8%] md:top-10 md:h-[360px] md:w-[640px]"
         src={media.heroVideo}
+        autoPlay={false}
       />
       <div className="relative flex flex-col font-display text-[24px] font-semibold uppercase leading-[24px] text-agents-white md:text-[40px] md:leading-[40px]">
         <p className="reveal-up md:ml-[26.35%]">driven by ideas</p>

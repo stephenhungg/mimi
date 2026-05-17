@@ -108,7 +108,9 @@ video {
 
 .work-card img,
 .work-card video,
-.service-preview img {
+.service-preview img,
+.client-mark,
+.final-video {
   will-change: transform;
 }
 
@@ -120,6 +122,12 @@ video {
   font-size: clamp(7rem, 46vw, 11.25rem);
   letter-spacing: -0.06em;
   line-height: 0.8;
+}
+
+@media (min-width: 810px) {
+  .agents-fit-text {
+    font-size: clamp(11rem, 26.5vw, 24.5rem);
+  }
 }
 
 .agents-watermark {
