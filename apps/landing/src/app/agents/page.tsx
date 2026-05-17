@@ -9,8 +9,9 @@ import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { SplitText } from "gsap/SplitText";
 import { CustomEase } from "gsap/CustomEase";
+import { Flip } from "gsap/Flip";
 
-gsap.registerPlugin(useGSAP, ScrollTrigger, ScrollSmoother, ScrollToPlugin, SplitText, CustomEase);
+gsap.registerPlugin(useGSAP, ScrollTrigger, ScrollSmoother, ScrollToPlugin, SplitText, CustomEase, Flip);
 
 const media = {
   hero: "/hero.png",
@@ -22,7 +23,8 @@ const media = {
   otter: "/otter.png",
   bunny: "/bunny.png",
   giraffe: "/giraffe.png",
-  icon: "/icon.png"
+  icon: "/icon.png",
+  stickerSheet: "/kawaii/sticker-sheet.png"
 };
 
 type CuteStyle = CSSProperties & Record<`--${string}`, string>;
@@ -228,12 +230,14 @@ export default function AgentsPage() {
         : ScrollSmoother.create({
             wrapper: ".agents-smooth-wrapper",
             content: ".agents-smooth-content",
-            smooth: 1.2,
+            smooth: 1.55,
+            smoothTouch: 0.18,
             effects: false,
             normalizeScroll: false,
             ignoreMobileResize: true
           });
       let headlineSplit: { words: Element[]; revert: () => void } | undefined;
+      const sectionSplits: Array<{ revert: () => void }> = [];
 
       root.current?.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((link) => {
         const onClick = (event: MouseEvent) => {
@@ -359,6 +363,147 @@ export default function AgentsPage() {
             });
           }
         });
+
+        gsap.utils.toArray<HTMLElement>(".agents-section-split").forEach((heading) => {
+          const split = SplitText.create(heading, {
+            type: "lines",
+            mask: "lines",
+            aria: "auto",
+            linesClass: "agents-split-line"
+          }) as { lines: Element[]; revert: () => void };
+
+          sectionSplits.push(split);
+          gsap.from(split.lines, {
+            yPercent: 118,
+            rotate: 1.5,
+            stagger: 0.08,
+            ease: "none",
+            scrollTrigger: {
+              trigger: heading,
+              start: "top 86%",
+              end: "bottom 56%",
+              scrub: 1
+            }
+          });
+        });
+
+        gsap.to(".agents-sticker-sheet", {
+          yPercent: -12,
+          rotate: 1.8,
+          scale: 1.04,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".agents-sticker-board",
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1
+          }
+        });
+
+        gsap.to(".agents-sticker-tag", {
+          y: (index) => [-18, 14, -12][index % 3],
+          rotate: (index) => [-5, 4, -3][index % 3],
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".agents-sticker-board",
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.8
+          }
+        });
+
+        const mediaMatch = gsap.matchMedia();
+        cleanup.push(() => mediaMatch.revert());
+
+        mediaMatch.add("(min-width: 768px)", () => {
+          const bentoGrid = root.current?.querySelector<HTMLElement>(".agents-bento-grid");
+          const bentoCards = bentoGrid
+            ? gsap.utils.toArray<HTMLElement>(".agents-work-card", bentoGrid)
+            : [];
+
+          if (bentoGrid && bentoCards.length) {
+            const state = Flip.getState(bentoCards);
+            bentoGrid.classList.add("is-final");
+
+            const flip = Flip.from(state, {
+              absolute: true,
+              scale: true,
+              simple: true,
+              paused: true,
+              ease: "power2.inOut",
+              stagger: 0.025
+            });
+
+            gsap.timeline({
+              scrollTrigger: {
+                trigger: bentoGrid,
+                start: "top 74%",
+                end: "bottom 36%",
+                scrub: 0.9,
+                invalidateOnRefresh: true
+              }
+            }).add(flip, 0);
+          }
+
+          gsap.utils.toArray<HTMLElement>(".agents-horizontal-section").forEach((section) => {
+            const track = section.querySelector<HTMLElement>(".agents-horizontal-track");
+            if (!track) return;
+
+            const distance = () => Math.max(0, track.scrollWidth - section.clientWidth + 48);
+
+            gsap.to(track, {
+              x: () => -distance(),
+              ease: "none",
+              scrollTrigger: {
+                trigger: section,
+                start: "top top",
+                end: () => `+=${distance() + window.innerHeight * 0.72}`,
+                pin: true,
+                scrub: 1,
+                anticipatePin: 1,
+                invalidateOnRefresh: true
+              }
+            });
+          });
+
+          return () => {
+            bentoGrid?.classList.remove("is-final");
+          };
+        });
+
+        const footerBounce = root.current?.querySelector<HTMLElement>(".agents-footer-bounce");
+        if (footerBounce) {
+          const runBounce = (velocity: number, direction: number) => {
+            const force = gsap.utils.clamp(0.16, 0.9, Math.abs(velocity) / 4200);
+            gsap.fromTo(
+              footerBounce,
+              {
+                y: -34 * force,
+                scaleY: 1 + force * 0.44,
+                skewX: direction * force * -5,
+                transformOrigin: "50% 100%"
+              },
+              {
+                y: 0,
+                scaleY: 1,
+                skewX: 0,
+                duration: 1.35,
+                ease: `elastic.out(${1 + force * 0.7}, ${0.56 - force * 0.2})`,
+                overwrite: true
+              }
+            );
+          };
+
+          ScrollTrigger.create({
+            trigger: footerBounce,
+            start: "top bottom",
+            onEnter: (self) => runBounce(self.getVelocity(), self.direction),
+            onEnterBack: (self) => runBounce(self.getVelocity(), self.direction)
+          });
+        }
+
+        const refreshFrame = window.requestAnimationFrame(() => ScrollTrigger.refresh());
+        cleanup.push(() => window.cancelAnimationFrame(refreshFrame));
       }
 
       gsap.utils.toArray<HTMLElement>(".agents-work-card").forEach((card) => {
@@ -518,6 +663,7 @@ export default function AgentsPage() {
       return () => {
         cleanup.forEach((remove) => remove());
         headlineSplit?.revert();
+        sectionSplits.forEach((split) => split.revert());
         smoother?.kill();
       };
     },
@@ -534,6 +680,8 @@ export default function AgentsPage() {
           <StickerRail />
           <FeaturedWork />
           <Squad />
+          <StickerBoard />
+          <PinnedSquad />
           <Workflow activeService={activeService} onService={setActiveService} />
           <FinalSection />
           <Footer clock={clock} />
@@ -677,7 +825,7 @@ function FeaturedWork() {
         <div className="mb-9 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div className="agents-reveal-up">
             <p className="agents-kicker mb-3">room layers</p>
-            <h2 className="font-display text-[clamp(3rem,8vw,7.8rem)] font-bold leading-[0.9]">
+            <h2 className="agents-section-split font-display text-[clamp(3rem,8vw,7.8rem)] font-bold leading-[0.9]">
               cute work, no loose ends.
             </h2>
           </div>
@@ -686,7 +834,7 @@ function FeaturedWork() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="agents-bento-grid">
           {missions.map((mission) => (
             <a
               key={mission.title}
@@ -729,7 +877,7 @@ function Squad() {
       <div className="mx-auto max-w-[1180px]">
         <div className="agents-reveal-up mb-10 max-w-[760px]">
           <p className="agents-kicker mb-3">the tiny staff</p>
-          <h2 className="font-display text-[clamp(3rem,8vw,8.4rem)] font-bold leading-[0.88]">
+          <h2 className="agents-section-split font-display text-[clamp(3rem,8vw,8.4rem)] font-bold leading-[0.88]">
             five specialists, one very bossy dog.
           </h2>
         </div>
@@ -758,6 +906,100 @@ function Squad() {
   );
 }
 
+function StickerBoard() {
+  return (
+    <section className="agents-sticker-board relative overflow-hidden px-4 py-24 md:px-6 md:py-32">
+      <div className="mx-auto grid max-w-[1180px] items-center gap-8 lg:grid-cols-[0.88fr_1.12fr]">
+        <div className="agents-reveal-up relative z-10">
+          <p className="agents-kicker mb-3">fresh sticker sheet</p>
+          <h2 className="agents-section-split font-display text-[clamp(3rem,8vw,7.8rem)] font-bold leading-[0.9]">
+            kawaii ops, absolutely weaponized.
+          </h2>
+          <p className="mt-5 max-w-[480px] font-inter text-[18px] font-extrabold leading-[1.35] text-agents-gray">
+            the crew has a proper visual system now: chunky stickers, soft paper, tiny tools, and enough mascot energy to make the boring ops shit feel weirdly lovable.
+          </p>
+        </div>
+
+        <div className="agents-sticker-sheet-wrap agents-reveal-up relative">
+          <img className="agents-sticker-sheet" src={media.stickerSheet} alt="" />
+          {[
+            ["ci", agents[1].accent],
+            ["mail", agents[2].accent],
+            ["notes", agents[4].accent]
+          ].map(([label, accent], index) => (
+            <span
+              key={label}
+              className={`agents-sticker-tag agents-sticker-tag-${index + 1}`}
+              style={{ "--agent": accent } as CuteStyle}
+            >
+              {label}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PinnedSquad() {
+  const cards = [
+    ...agents.map((agent) => ({
+      key: agent.id,
+      title: agent.name,
+      label: agent.role,
+      line: agent.line,
+      image: agent.image,
+      accent: agent.accent,
+      soft: agent.soft
+    })),
+    ...workflow.map((step) => ({
+      key: step.title,
+      title: step.title,
+      label: step.kicker,
+      line: step.line,
+      image: step.image,
+      accent: step.accent,
+      soft: "#fffaf0"
+    }))
+  ];
+
+  return (
+    <section className="agents-horizontal-section relative overflow-hidden px-4 py-20 md:px-6">
+      <div className="mx-auto flex max-w-[1180px] flex-col gap-5 md:flex-row md:items-end md:justify-between">
+        <div className="agents-reveal-up max-w-[760px]">
+          <p className="agents-kicker mb-3">scroll the desk</p>
+          <h2 className="agents-section-split font-display text-[clamp(3rem,8vw,7.4rem)] font-bold leading-[0.9]">
+            pinned, scrubbed, tiny little task parade.
+          </h2>
+        </div>
+        <p className="agents-reveal-up max-w-[340px] font-inter text-[17px] font-extrabold leading-[1.35] text-agents-gray">
+          this strip is lifted from the downloaded horizontal scroll pattern, rebuilt as mimi’s squad desk.
+        </p>
+      </div>
+
+      <div className="agents-horizontal-track mt-10 flex w-max gap-4">
+        {cards.map((card, index) => (
+          <article
+            key={`${card.key}-${index}`}
+            tabIndex={0}
+            className="agents-squad-card agents-horizontal-card flex flex-col"
+            style={{ "--agent": card.accent, "--agent-soft": card.soft } as CuteStyle}
+          >
+            <div className="agents-squad-image">
+              <img src={card.image} alt="" />
+            </div>
+            <div className="mt-auto flex flex-col gap-2">
+              <p className="agents-squad-name">{card.title}</p>
+              <p className="font-inter text-[13px] font-extrabold text-agents-gray">{card.label}</p>
+              <p className="font-inter text-[15px] font-bold leading-[1.25]">{card.line}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Workflow({
   activeService,
   onService
@@ -781,7 +1023,7 @@ function Workflow({
         <div className="flex flex-col">
           <div className="agents-reveal-up mb-8">
             <p className="agents-kicker mb-3">how the room runs</p>
-            <h2 className="font-display text-[clamp(3rem,8vw,7rem)] font-bold leading-[0.9]">
+            <h2 className="agents-section-split font-display text-[clamp(3rem,8vw,7rem)] font-bold leading-[0.9]">
               less inbox dread, more tiny order.
             </h2>
           </div>
@@ -818,7 +1060,7 @@ function FinalSection() {
       <div className="agents-final-panel agents-reveal-up mx-auto grid max-w-[1180px] gap-8 overflow-hidden lg:grid-cols-[0.95fr_1.05fr]">
         <div className="flex flex-col justify-center p-6 md:p-10">
           <p className="agents-kicker mb-4">ready room</p>
-          <h2 className="font-display text-[clamp(3rem,8vw,7.4rem)] font-bold leading-[0.88]">
+          <h2 className="agents-section-split font-display text-[clamp(3rem,8vw,7.4rem)] font-bold leading-[0.88]">
             give your chaos a desk.
           </h2>
           <p className="mt-5 max-w-[520px] font-inter text-[18px] font-bold leading-[1.35] text-agents-gray">
@@ -844,6 +1086,7 @@ function FinalSection() {
 function Footer({ clock }: { clock: string }) {
   return (
     <footer id="contact" className="relative overflow-hidden px-4 pb-8 pt-20 md:px-6">
+      <div className="agents-footer-bounce" aria-hidden="true" />
       <div className="mx-auto grid max-w-[1180px] gap-8 border-t-[3px] border-agents-white pt-8 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
         <div className="agents-reveal-up">
           <img className="mb-5 w-full max-w-[280px]" src={media.wordmark} alt="mimi." />

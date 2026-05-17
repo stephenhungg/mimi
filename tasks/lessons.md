@@ -46,6 +46,10 @@ format: **<topic>** — what to do / what not to do. **why:** the reason. **how 
 
 ## process
 
+**make animation receipts visible, not just installed.** when the user asks "where is the gsap shit", they mean the page should clearly demonstrate gsap-only motion: pinned sections, scrubbed timelines, split text, hover physics, smooth scroll, and interaction polish.
+**why:** smooth scrolling and small reveal tweens can be technically correct but visually underwhelming; the product has to feel reverse-engineered and custom, not like static cards with a dependency installed.
+**how to apply:** for landing-page animation work, include at least one unmistakable scroll-driven sequence, one tactile hover interaction, one load choreography, and one verification artifact that proves the motion runs in-browser.
+
 **boil-the-ocean works only with a north-star killshot.** when scope is "everything", choose one demo moment (here: 1:30-2:00 commit→tiger jolts→PR) and order tasks so that beat works first, then expand outward.
 **why:** infinite scope without a focal beat = no demo at submission time. focal beat means at any cut-off, we have something to show.
 **how to apply:** wave 0 (foundation) → wave 1 (visual + network + agent + worker spines) → wave 2 (the killshot integration) → wave 3+ (everything else around it).

@@ -273,7 +273,8 @@ async function speak(input: SpeakInput, ctx: ToolContext): Promise<string> {
   if (!text) return "speak called with empty text";
   await ctx.broadcaster.broadcastSpeak(text);
   ctx.speakLog.push(text);
-  // log the line as a single-turn conversation. cheap, append-only.
+  // log the line in both stores: conversations keep the transcript, events feed
+  // the 3d room's short-poll state.
   try {
     await ctx.notion.appendConversation({
       ts: new Date().toISOString(),
@@ -284,6 +285,23 @@ async function speak(input: SpeakInput, ctx: ToolContext): Promise<string> {
   } catch (err) {
     // do not fail the tool over notion latency / hiccups.
     console.warn(`[${ctx.identity}] conversation log failed:`, err);
+  }
+  try {
+    await ctx.notion.appendEvent({
+      source: "manual",
+      type: "manual.poke",
+      ts: new Date().toISOString(),
+      summary: text,
+      agent: ctx.species,
+      rawPayload: JSON.stringify({
+        kind: "agent_speak",
+        identity: ctx.identity,
+        species: ctx.species,
+        text,
+      }),
+    });
+  } catch (err) {
+    console.warn(`[${ctx.identity}] speak event log failed:`, err);
   }
   return `spoke: ${text}`;
 }

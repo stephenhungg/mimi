@@ -155,6 +155,15 @@ remaining fidelity notes:
 - [ ] update css tokens/treatments for sticker shadows, cute panels, sparkles, cursor behavior, and mobile polish.
 - [ ] run targeted lint/build checks and inspect the local page in headed chrome.
 
+## gsap codepen download port pass
+
+- [x] inspect downloaded gsap codepen exports for portable patterns.
+- [x] generate and save a new higgsfield sticker-sheet asset for mimi.
+- [ ] port the useful codepen patterns into the next.js/tailwind agents home page.
+- [ ] add obvious scroll-driven gsap: pinned horizontal squad strip, scrubbed bento/flip motion, sticker-sheet parallax, and footer velocity bounce.
+- [ ] preserve hover-only work-card overlay behavior while making hover animation more tactile.
+- [ ] verify with targeted lint/typecheck plus headed browser screenshots/interactions.
+
 ## web modular avatar system
 
 - [x] read `docs/AVATAR-SYSTEM.md` end to end.
@@ -194,4 +203,6 @@ remaining fidelity notes:
 - [x] verified no obvious `ntn_...` token remains in searchable non-build files.
 - [x] ran typecheck gates for `apps/landing`, `apps/web`, and `agents/runtime`.
 - [ ] rotate the exposed notion credential that had been written to `workers/.env-tmp/common`.
-- [ ] decide whether to implement real queued echo-chamber recursion or downgrade the docs/comments to the current one-fanout behavior.
+- [x] implement real bounded echo-chamber recursion instead of downgrading the docs/comments.
+- [x] write actual `agent_speak` rows into the notion events stream so `/api/agent-state` can surface real speech.
+- [x] make the web chat overlay observe fresh agent replies and post the next transcript slice back to `/api/team-chat` until the 8-round cap.
