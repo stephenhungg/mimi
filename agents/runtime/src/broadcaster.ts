@@ -55,7 +55,8 @@ export class LiveKitBroadcaster {
     const url = required(env, ENV.LIVEKIT_URL);
     const apiKey = required(env, ENV.LIVEKIT_API_KEY);
     const apiSecret = required(env, ENV.LIVEKIT_API_SECRET);
-    const room = required(env, ENV.LIVEKIT_ROOM);
+    // default room name — single shared room is the v1 design.
+    const room = env[ENV.LIVEKIT_ROOM] ?? "mimi-house-main";
     return new LiveKitBroadcaster({
       url, apiKey, apiSecret, room,
       identity: opts.identity, species: opts.species, name: opts.name,
@@ -75,22 +76,41 @@ export class LiveKitBroadcaster {
   }
 
   // announce presence + initial pose. call once on startup.
+  // resilient — if livekit is unreachable / unauthed, log + continue. the agent
+  // can still do notion work without a 3D presence. better than crashing the
+  // whole process every time creds are wrong.
   async start(): Promise<void> {
-    await this.mintToken(); // just to validate creds early
+    try {
+      await this.mintToken(); // validate creds early
+    } catch (err) {
+      console.warn(`[broadcaster] mintToken failed (livekit creds invalid?): ${(err as Error).message}`);
+    }
     const home = SPECIES_DESK[this.species];
-    await this.broadcast({
-      type: "presence",
-      identity: this.identity,
-      kind: "agent",
-      species: this.species,
-      name: this.name,
-      pos: { x: home[0], z: home[1] },
-    });
+    try {
+      await this.broadcast({
+        type: "presence",
+        identity: this.identity,
+        kind: "agent",
+        species: this.species,
+        name: this.name,
+        pos: { x: home[0], z: home[1] },
+      });
+    } catch (err) {
+      console.warn(`[broadcaster] initial presence broadcast failed: ${(err as Error).message}`);
+      console.warn(`[broadcaster] continuing without livekit — agent will still handle events + write to notion.`);
+    }
   }
 
+  // broadcast a message. swallows errors and logs them — never crashes the
+  // calling agent loop. agents call this from every tool, so a transient
+  // livekit blip shouldn't kill an entire claude turn.
   async broadcast(msg: Broadcast): Promise<void> {
-    const data = new TextEncoder().encode(JSON.stringify(msg));
-    await this.roomService.sendData(this.room, data, DataPacket_Kind.RELIABLE, {});
+    try {
+      const data = new TextEncoder().encode(JSON.stringify(msg));
+      await this.roomService.sendData(this.room, data, DataPacket_Kind.RELIABLE, {});
+    } catch (err) {
+      console.warn(`[broadcaster] ${msg.type} broadcast failed: ${(err as Error).message}`);
+    }
   }
 
   async broadcastState(state: AgentState, pos?: Position, mood?: Mood): Promise<void> {

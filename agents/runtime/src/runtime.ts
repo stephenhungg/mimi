@@ -74,33 +74,43 @@ export class AgentRuntime {
   }
 
   async start(): Promise<void> {
+    process.stderr.write(`[${this.identity}] starting…\n`);
     await this.broadcaster.start();
-    // resident upsert + joining event — best-effort, never block startup.
+    process.stderr.write(`[${this.identity}] broadcaster started\n`);
+    // resident upsert + joining event — best-effort + bounded so a notion 401
+    // or 5s+ cloudflare hiccup doesn't keep the listener from binding.
     const joinedAt = new Date().toISOString();
-    try {
-      await this.notion.upsertResident({
+    const TIMEOUT = 5000;
+    const timed = <T>(p: Promise<T>): Promise<T | null> =>
+      Promise.race([
+        p,
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), TIMEOUT)),
+      ]).catch((err) => {
+        console.warn(`[${this.identity}] notion call failed:`, (err as Error).message);
+        return null;
+      });
+    await timed(
+      this.notion.upsertResident({
         identity: this.identity,
         kind: "agent",
         name: this.persona.name,
         species: this.species,
         watches: this.persona.watches,
         joinedAt,
-      });
-    } catch (err) {
-      console.warn(`[${this.identity}] resident upsert failed:`, err);
-    }
-    try {
-      await this.notion.appendEvent({
+      }),
+    );
+    process.stderr.write(`[${this.identity}] resident upsert done\n`);
+    await timed(
+      this.notion.appendEvent({
         source: "manual",
         type: "manual.poke",
         ts: joinedAt,
         summary: `${this.identity} joined the room`,
         agent: this.species,
-      });
-    } catch (err) {
-      console.warn(`[${this.identity}] join event log failed:`, err);
-    }
-    console.log(`[${this.identity}] online — species=${this.species} watches=${this.persona.watches} model=${this.model}`);
+      }),
+    );
+    process.stderr.write(`[${this.identity}] join event logged\n`);
+    process.stderr.write(`[${this.identity}] online — species=${this.species} watches=${this.persona.watches} model=${this.model}\n`);
     // mimi (the dog) runs a periodic dispatch loop on top of the normal /event loop:
     // every 30s, she reads the last 2 min of events from notion and decides whether
     // to speak a dispatch line. this is what makes her feel like the room's coordinator.

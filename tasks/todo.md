@@ -56,3 +56,10 @@
 remaining fidelity notes:
 - the hero video frame can differ between captures because the framer reference and local page both play remote video; static screenshots should be compared by layout and treatment, not a single exact frame.
 - `tasks/artifacts/` is gitignored, so evidence is local-only unless explicitly moved into tracked docs.
+
+## headed animation fidelity pass
+
+- [ ] sample reference load, scroll, and hover motion in headed chrome.
+- [ ] sample local `/agents` motion in the same headed chrome setup.
+- [ ] patch gsap timings/transforms/hover behavior where the local motion diverges.
+- [ ] rebuild and verify `/agents` with headed screenshots plus lint/typecheck.
