@@ -134,7 +134,7 @@ export function PlayerController() {
     camera.position.z = Math.max(-BOUND, Math.min(BOUND, camera.position.z));
     camera.position.y = EYE_HEIGHT;
 
-    // publish to the cross-Canvas store so DOM (livekit broadcast) + scene
+    // publish to the cross-Canvas store so DOM overlays + scene
     // (proximity check for NPCDialogue) can read player pose.
     const yaw = Math.atan2(forward.current.x, forward.current.z);
     playerPosStore.set({ x: camera.position.x, z: camera.position.z, rot: yaw });

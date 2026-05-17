@@ -30,8 +30,8 @@ export interface Team {
   workspaceIcon?: string;
   hubPageId: string;
   dbs: NonNullable<NotionConnection["dbs"]>;
-  // livekit room name — derived from team id, but stored for convenience.
-  livekitRoom: string;
+  // stable room id — derived from team id, but stored for convenience.
+  roomId: string;
   createdAt: string;
 }
 
@@ -77,8 +77,8 @@ export function randomCode(bytes = 8): string {
   return Array.from(arr, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export function teamRoomName(teamId: string): string {
-  // livekit room names: keep it deterministic + short.
+export function teamRoomId(teamId: string): string {
+  // keep room ids deterministic + short.
   return `mimi-team-${teamId.slice(0, 12)}`;
 }
 
@@ -105,7 +105,7 @@ export async function createTeam(args: {
     workspaceIcon: args.ownerConnection.workspaceIcon,
     hubPageId: args.ownerConnection.hubPageId,
     dbs: args.ownerConnection.dbs,
-    livekitRoom: teamRoomName(id),
+    roomId: teamRoomId(id),
     createdAt: new Date().toISOString(),
   };
   const r = redisOrNull();
@@ -129,9 +129,18 @@ export async function getTeam(id: string): Promise<Team | null> {
   if (r) {
     const raw = await r.get<string>(`mimi:team:${id}`);
     if (!raw) return null;
-    return typeof raw === "string" ? (JSON.parse(raw) as Team) : (raw as Team);
+    return normalizeTeam(typeof raw === "string" ? JSON.parse(raw) : raw);
   }
-  return memTeams.get(id) ?? null;
+  const team = memTeams.get(id);
+  return team ? normalizeTeam(team) : null;
+}
+
+function normalizeTeam(raw: unknown): Team {
+  const team = raw as Team;
+  if (!team.roomId) {
+    team.roomId = teamRoomId(team.id);
+  }
+  return team;
 }
 
 export async function listUserTeams(userId: string): Promise<Team[]> {

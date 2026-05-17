@@ -146,6 +146,15 @@ remaining fidelity notes:
 - full `bun run lint`, `bun run typecheck`, and production build are currently blocked by unrelated untracked landing files under `apps/landing/src/app/api/notion/`, `apps/landing/src/app/connected/`, and `apps/landing/src/lib/`.
 - local server is running with `next dev` so `/agents` reflects the current source despite those unrelated production-check blockers.
 
+## cuteness overloadmaxx pass
+
+- [ ] replace the remaining framer-portfolio structure with a mascot-led mimi landing composition.
+- [ ] make the hero feel like a sticker command center: wordmark asset, squad chips, stronger product promise, and cleaner mobile crop.
+- [ ] add extra gsap delight: intro pop sequence, floating mascots, scroll reveals, hover bounce/tilt, and active squad/workflow motion.
+- [ ] make work/squad sections read as mimi product workflows instead of portfolio cards.
+- [ ] update css tokens/treatments for sticker shadows, cute panels, sparkles, cursor behavior, and mobile polish.
+- [ ] run targeted lint/build checks and inspect the local page in headed chrome.
+
 ## web modular avatar system
 
 - [x] read `docs/AVATAR-SYSTEM.md` end to end.
@@ -166,3 +175,12 @@ remaining fidelity notes:
 - `/Users/stephenhung/.bun/bin/bun run --cwd apps/web build` passed; vite built 601 modules.
 - `curl -I http://127.0.0.1:5173/` returned `200`; `curl -I http://127.0.0.1:5173/models/base/mimi_base_v1.glb` returned `200` with `Content-Type: model/gltf-binary`.
 - headed Chrome loaded `http://127.0.0.1:5173/` and rendered the 3D room HUD/scene; headless Chrome screenshot did not render WebGL, so it is not used as visual evidence.
+
+## realtime purge
+
+- [x] delete the old realtime client hook, remote peer renderer, and token route.
+- [x] remove realtime sdk dependencies from web, landing, runtime, and lockfile.
+- [x] wire web to notion-backed `agent-poll`, shared stores, and static `AgentMesh` occupants.
+- [x] rename team room metadata from provider-specific naming to `roomId`.
+- [x] remove provider references from source comments, docs, and persona examples.
+- [ ] run typecheck/build gates and push.

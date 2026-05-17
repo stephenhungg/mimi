@@ -1,4 +1,4 @@
-# agents/runtime — per-agent process
+# agents/runtime - per-agent process
 
 One process per chibi agent. Drives its claude calls, animalese, position in the 3D world, and notion writes.
 
@@ -12,8 +12,7 @@ One process per chibi agent. Drives its claude calls, animalese, position in the
 │ • claude sonnet 4.6 via anthropic   │
 │ • tools: speak, walk_to, pick_up,   │
 │   write_notion, query_other_agent   │
-│ • livekit-server-sdk → joins room   │
-│   as a participant                  │
+│ • emits state to notion-backed logs │
 │ • subscribes to notion webhooks via │
 │   the mimi-events worker            │
 └─────────────────────────────────────┘
@@ -31,7 +30,7 @@ bun start-all
 
 ## Tools the agent has
 
-- `speak(text)` — animalese to the room via livekit data channel
+- `speak(text)` — animalese/state event for the room
 - `walk_to(x, y, z)` — broadcast a new position
 - `pick_up(artifact_id)` — claim an artifact, animate hold
 - `write_notion(db, row)` — call mimi-events worker to write a db row

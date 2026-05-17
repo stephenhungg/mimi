@@ -1,12 +1,12 @@
-# apps/web — 3D world client
+# apps/web - 3D world client
 
-The first-person multiplayer 3D office. Where humans (chibi humans) and agents (chibi animals) coexist.
+The first-person 3D office. Where humans (chibi humans) and agents (chibi animals) coexist.
 
 ## Stack
 
 - vite + react + typescript
 - @react-three/fiber + @react-three/drei
-- livekit-client (data channel for positions + chat, audio channel for human voice)
+- notion-backed short polling for agent state
 - bun as runtime + package manager
 
 ## Run
@@ -22,7 +22,7 @@ Opens at `http://localhost:5173`.
 
 - `src/scenes/` — r3f scenes (the office room, the lobby, the onboarding scene)
 - `src/components/` — react components (chibi avatars, profile cards, chat overlay, sprite renderers)
-- `src/lib/` — livekit transport, notion client wrapper, animalese player binding
+- `src/lib/` — agent polling, shared stores, notion client wrapper, animalese player binding
 - `src/styles/` — tailwind / global css
 - `public/sprites/` — chibi sprite sheets (mirrored from `design/assets/`)
 - `public/icons/` — app icon, favicon

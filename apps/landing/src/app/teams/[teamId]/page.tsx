@@ -18,7 +18,7 @@ interface TeamState {
   name: string;
   workspaceName: string;
   workspaceIcon?: string;
-  livekitRoom: string;
+  roomId: string;
   isOwner: boolean;
   members: string[];
   assignments: Assignment[];
@@ -114,7 +114,7 @@ export default function TeamPage({ params }: { params: Promise<{ teamId: string 
         <div className="sticker" style={{ background: "var(--asphalt)", color: "var(--paper)", padding: 24, marginBottom: 24 }}>
           <h2 style={{ margin: "0 0 8px", fontSize: 20 }}>enter the room</h2>
           <p style={{ margin: "0 0 16px", opacity: 0.85, fontSize: 14 }}>
-            a shared 3D room. all members + all assigned agents live here. multiplayer presence via livekit room <code style={{ background: "rgba(255,255,255,.1)", padding: "2px 6px", borderRadius: 4 }}>{team.livekitRoom}</code>.
+            a shared 3D room. all members + all assigned agents live here. room id <code style={{ background: "rgba(255,255,255,.1)", padding: "2px 6px", borderRadius: 4 }}>{team.roomId}</code>.
           </p>
           <a href={enterRoom} className="pill" style={{ background: "var(--paper)", color: "var(--asphalt)" }}>enter →</a>
         </div>

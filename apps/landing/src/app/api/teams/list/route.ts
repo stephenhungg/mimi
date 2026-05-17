@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
       workspaceIcon: t.workspaceIcon,
       ownerUserId: t.ownerUserId,
       isOwner: t.ownerUserId === userId,
-      livekitRoom: t.livekitRoom,
+      roomId: t.roomId,
       createdAt: t.createdAt,
     })),
   });

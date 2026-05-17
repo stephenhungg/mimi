@@ -1,68 +1,43 @@
-// shared context for the single useMimiRoom() instance. created once at the
-// App root and consumed by RemotePeers (inside Canvas), ChatOverlay (DOM),
-// NPCDialogue (DOM), and the proximity hint logic in Room.
+// shared stores for cross-canvas/dom state.
+//
+// realtime vendor transport is removed. do not re-add room providers,
+// socket-style room hooks, or realtime vendor sdks to this app. transport is
+// HTTP — apps/web polls /api/agent-state in apps/landing.
+//
+// stores (plain pub/sub — no react context, so they bridge canvas/dom):
+//   • playerPosStore   — local player camera pose, written by PlayerController.
+//   • trainerCardStore — which agent's trainer card is open.
+//   • agentStateStore  — latest agent state per identity (polled from notion).
+//   • chatStore        — recent chat lines (user messages + agent speaks).
+//                        replaces the old room-context chat array.
 
-import { createContext, useContext, type ReactNode } from "react";
-import type { UseMimiRoomResult } from "./livekit";
+import type { Species, AgentState, Mood } from "@mimi/types";
+import type { TrainerCardData } from "../components/TrainerCard";
 
-const MimiRoomContext = createContext<UseMimiRoomResult | null>(null);
-
-export function MimiRoomProvider({
-  value,
-  children,
-}: {
-  value: UseMimiRoomResult;
-  children: ReactNode;
-}) {
-  return <MimiRoomContext.Provider value={value}>{children}</MimiRoomContext.Provider>;
-}
-
-export function useMimiRoomContext(): UseMimiRoomResult {
-  const ctx = useContext(MimiRoomContext);
-  if (!ctx) {
-    throw new Error("useMimiRoomContext must be used inside <MimiRoomProvider>");
-  }
-  return ctx;
-}
-
-// hook for the player's current camera position. r3f Canvas creates an
-// isolated React root, so we can't share a normal ref across Canvas/DOM —
-// instead we expose a tiny pub/sub the player can write to and DOM can read.
+// ─── player pose ────────────────────────────────────────────────────────────
 
 export interface PlayerPos {
   x: number;
   z: number;
-  // facing yaw, radians. used by presence broadcast.
-  rot: number;
+  rot: number; // yaw radians
 }
 
 class PlayerPosStore {
   private pos: PlayerPos = { x: 0, z: 0, rot: 0 };
   private listeners = new Set<(p: PlayerPos) => void>();
-
   set(p: PlayerPos): void {
     this.pos = p;
     this.listeners.forEach((l) => l(p));
   }
-
-  get(): PlayerPos {
-    return this.pos;
-  }
-
+  get(): PlayerPos { return this.pos; }
   subscribe(fn: (p: PlayerPos) => void): () => void {
     this.listeners.add(fn);
-    return () => {
-      this.listeners.delete(fn);
-    };
+    return () => { this.listeners.delete(fn); };
   }
 }
-
 export const playerPosStore = new PlayerPosStore();
 
-// active trainer card store — same pub/sub pattern so the in-Canvas billboard
-// click handler can open the DOM-rendered TrainerCard.
-
-import type { TrainerCardData } from "../components/TrainerCard";
+// ─── trainer card ───────────────────────────────────────────────────────────
 
 class TrainerCardStore {
   private active: TrainerCardData | null = null;
@@ -75,16 +50,88 @@ class TrainerCardStore {
     this.active = null;
     this.listeners.forEach((l) => l(null));
   }
-  get(): TrainerCardData | null {
-    return this.active;
-  }
+  get(): TrainerCardData | null { return this.active; }
   subscribe(fn: (c: TrainerCardData | null) => void): () => void {
     this.listeners.add(fn);
-    return () => {
-      this.listeners.delete(fn);
-    };
+    return () => { this.listeners.delete(fn); };
   }
 }
-
 export const trainerCardStore = new TrainerCardStore();
 
+// ─── agent state (polled from notion via /api/agent-state) ─────────────────
+
+export interface AgentLiveState {
+  species: Species;
+  identity: string;
+  state: AgentState;
+  mood?: Mood;
+  pos?: { x: number; z: number };
+  speaking?: string;
+  lastSpeakTs?: number;
+}
+
+class AgentStateStore {
+  private map = new Map<string, AgentLiveState>();
+  private listeners = new Set<(snap: Map<string, AgentLiveState>) => void>();
+  upsert(s: AgentLiveState): void {
+    this.map.set(s.identity, s);
+    this.listeners.forEach((l) => l(this.map));
+  }
+  replace(entries: AgentLiveState[]): void {
+    this.map.clear();
+    for (const e of entries) this.map.set(e.identity, e);
+    this.listeners.forEach((l) => l(this.map));
+  }
+  get(identity: string): AgentLiveState | undefined { return this.map.get(identity); }
+  all(): Map<string, AgentLiveState> { return this.map; }
+  subscribe(fn: (snap: Map<string, AgentLiveState>) => void): () => void {
+    this.listeners.add(fn);
+    fn(this.map);
+    return () => { this.listeners.delete(fn); };
+  }
+}
+export const agentStateStore = new AgentStateStore();
+
+// ─── chat (user + agent speech) ────────────────────────────────────────────
+
+export interface ChatRow {
+  kind: "chat" | "agent_speak";
+  identity: string;
+  name: string;
+  species?: Species;
+  text: string;
+  ts: number;
+}
+
+class ChatStore {
+  private rows: ChatRow[] = [];
+  private listeners = new Set<(rows: ChatRow[]) => void>();
+  push(row: ChatRow): void {
+    this.rows = [...this.rows, row].slice(-50);
+    this.listeners.forEach((l) => l(this.rows));
+  }
+  all(): ChatRow[] { return this.rows; }
+  subscribe(fn: (rows: ChatRow[]) => void): () => void {
+    this.listeners.add(fn);
+    fn(this.rows);
+    return () => { this.listeners.delete(fn); };
+  }
+}
+export const chatStore = new ChatStore();
+
+// ─── identity helper ───────────────────────────────────────────────────────
+
+export function loadOrCreateLocalIdentity(): { identity: string; name: string } {
+  if (typeof window === "undefined") return { identity: "guest", name: "guest" };
+  let id = window.localStorage.getItem("mimi_identity");
+  if (!id) {
+    id = `guest-${Math.random().toString(36).slice(2, 8)}`;
+    window.localStorage.setItem("mimi_identity", id);
+  }
+  let nm = window.localStorage.getItem("mimi_name");
+  if (!nm) {
+    nm = id;
+    window.localStorage.setItem("mimi_name", nm);
+  }
+  return { identity: id, name: nm };
+}

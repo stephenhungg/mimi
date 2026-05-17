@@ -41,7 +41,7 @@ export const SPECIES_DESK: Record<Species, [number, number]> = {
   dog: [0, 0], // center rug — oversight
 };
 
-// ─── agent state (broadcast over livekit data channel) ──────────────────────
+// ─── agent state (broadcast over the app transport) ─────────────────────────
 
 export type AgentState =
   | "idle" // standing, gentle bob
@@ -65,9 +65,9 @@ export interface Position {
   rot?: number; // facing yaw, radians
 }
 
-// ─── broadcasts (livekit data channel envelope) ─────────────────────────────
+// ─── broadcasts (app transport envelope) ────────────────────────────────────
 
-// every payload sent over livekit data channel carries one of these.
+// every runtime transport payload carries one of these.
 export type Broadcast =
   | { type: "presence"; identity: string; kind: "human" | "agent"; species?: Species; name: string; pos: Position }
   | { type: "agent_state"; identity: string; species: Species; state: AgentState; pos?: Position; mood?: Mood }
@@ -222,10 +222,6 @@ export const ENV = {
   NOTION_DB_ARTIFACTS: "NOTION_DB_ARTIFACTS",
   NOTION_DB_CONVERSATIONS: "NOTION_DB_CONVERSATIONS",
   NOTION_DB_AGENT_MEMORY: "NOTION_DB_AGENT_MEMORY",
-  LIVEKIT_URL: "LIVEKIT_URL",
-  LIVEKIT_API_KEY: "LIVEKIT_API_KEY",
-  LIVEKIT_API_SECRET: "LIVEKIT_API_SECRET",
-  LIVEKIT_ROOM: "LIVEKIT_ROOM",
   ANTHROPIC_API_KEY: "ANTHROPIC_API_KEY",
   ANTHROPIC_MODEL: "ANTHROPIC_MODEL",
   GITHUB_WEBHOOK_SECRET: "GITHUB_WEBHOOK_SECRET",

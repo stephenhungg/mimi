@@ -29,7 +29,7 @@ export async function GET(
     name: team.name,
     workspaceName: team.workspaceName,
     workspaceIcon: team.workspaceIcon,
-    livekitRoom: team.livekitRoom,
+    roomId: team.roomId,
     isOwner: team.ownerUserId === userId,
     members,
     assignments,

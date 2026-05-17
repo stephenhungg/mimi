@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
   const res = NextResponse.json({
     ok: true,
-    team: { id: team.id, name: team.name, workspaceName: team.workspaceName, livekitRoom: team.livekitRoom },
+    team: { id: team.id, name: team.name, workspaceName: team.workspaceName, roomId: team.roomId },
   });
   if (needsCookie) {
     res.cookies.set("mimi_user_id", userId, {

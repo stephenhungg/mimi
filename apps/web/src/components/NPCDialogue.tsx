@@ -1,246 +1,154 @@
-// walk-up-and-talk NPC dialogue. proximity hint appears when the player is
-// within 3 units of an agent; E opens a modal that POSTs to the agent's
-// /dialogue endpoint. the agent broadcasts agent_speak in response, which
-// flows back through the livekit hook → AgentBillboard's SpeechBubble.
+// npc dialogue — proximity-triggered modal to talk to an agent.
+// reads player pose + agent positions. on E press near an agent, opens a modal,
+// posts to the agent's /dialogue endpoint via the landing router, shows the
+// reply text in the modal then auto-closes 1s after the agent's speak lands.
+//
+// agent replies come back from the POST body itself (since /dialogue is
+// synchronous), and the agent's broadcast is reflected via the poll loop into
+// agentStateStore.
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { BRAND, type Species } from "@mimi/types";
-import { useMimiRoomContext } from "../lib/room-context";
-import { playerPosStore, type PlayerPos } from "../lib/room-context";
+import { useEffect, useState } from "react";
+import { SPECIES_DESK, type Species } from "@mimi/types";
 import { useTyping } from "../lib/typing";
+import { playerPosStore, type PlayerPos, agentStateStore } from "../lib/room-context";
 
+const ALL_SPECIES: Species[] = ["tiger", "otter", "bunny", "dog", "giraffe"];
 const PROXIMITY = 3;
+
+interface DialogueResponse {
+  ok?: boolean;
+  speakLog?: Array<{ text?: string }>;
+}
+
 const AGENT_BASE_URL =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- vite env typing varies
-  (import.meta as any).env?.VITE_AGENT_BASE_URL ?? "http://localhost:8081";
+  (import.meta as { env?: { VITE_AGENT_BASE_URL?: string } }).env?.VITE_AGENT_BASE_URL ??
+  "http://localhost:3000/api/agent";
 
-interface NearestAgent {
-  identity: string;
-  species: Species;
-  name: string;
-  distance: number;
-}
-
-interface NPCDialogueProps {
-  identity: string;
-}
-
-export function NPCDialogue({ identity }: NPCDialogueProps) {
-  const { peers } = useMimiRoomContext();
+export function NPCDialogue({ identity }: { identity: string }) {
+  const [near, setNear] = useState<Species | null>(null);
+  const [open, setOpen] = useState<Species | null>(null);
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [reply, setReply] = useState<string | null>(null);
   const { setTyping } = useTyping();
 
-  // poll player pos (10Hz) and compute nearest agent. avoids tying this DOM
-  // component into r3f's frame loop.
-  const [playerPos, setPlayerPos] = useState<PlayerPos>(() => playerPosStore.get());
+  // proximity check — subscribe to player pose, find nearest agent within 3u.
   useEffect(() => {
-    return playerPosStore.subscribe((p) => setPlayerPos(p));
+    const check = (p: PlayerPos) => {
+      let bestSpecies: Species | null = null;
+      let bestDist = PROXIMITY;
+      for (const s of ALL_SPECIES) {
+        const home = SPECIES_DESK[s];
+        const ax = home[0];
+        const az = home[1];
+        const dx = p.x - ax;
+        const dz = p.z - az;
+        const d = Math.sqrt(dx * dx + dz * dz);
+        if (d < bestDist) { bestDist = d; bestSpecies = s; }
+      }
+      setNear(bestSpecies);
+    };
+    check(playerPosStore.get());
+    return playerPosStore.subscribe(check);
   }, []);
 
-  const nearest = useMemo<NearestAgent | null>(() => {
-    let best: NearestAgent | null = null;
-    for (const peer of peers.values()) {
-      if (peer.kind !== "agent" || !peer.species) continue;
-      if (peer.identity === identity) continue;
-      const dx = peer.pos.x - playerPos.x;
-      const dz = peer.pos.z - playerPos.z;
-      const d = Math.hypot(dx, dz);
-      if (d > PROXIMITY) continue;
-      if (!best || d < best.distance) {
-        best = {
-          identity: peer.identity,
-          species: peer.species,
-          name: peer.name,
-          distance: d,
-        };
-      }
-    }
-    return best;
-  }, [peers, playerPos, identity]);
-
-  // modal state.
-  const [open, setOpen] = useState(false);
-  const [modalTarget, setModalTarget] = useState<NearestAgent | null>(null);
-  const [draft, setDraft] = useState("");
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // E opens the modal — only when a nearest agent exists and we're not
-  // already in a typing state (chat or modal already open).
+  // keyboard handling — E to open, Esc to close.
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.code === "KeyE" && !open && nearest) {
-        // only fire if the active element isn't an input/textarea.
-        const ae = document.activeElement;
-        const tag = ae?.tagName.toLowerCase();
-        if (tag === "input" || tag === "textarea") return;
-        e.preventDefault();
-        setModalTarget(nearest);
-        setOpen(true);
-        setTyping(true);
-      } else if (e.code === "Escape" && open) {
-        e.preventDefault();
-        close();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setOpen(null); setText(""); setReply(null); setTyping(false); return; }
+      if ((e.key === "e" || e.key === "E") && near && !open) {
+        setOpen(near); setTyping(true);
       }
-    }
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // intentionally referencing close via stable identity through state setters.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, nearest, setTyping]);
+  }, [near, open, setTyping]);
 
-  // when modal opens, focus the input.
-  useEffect(() => {
-    if (open) {
-      // requestAnimationFrame so the input is mounted.
-      requestAnimationFrame(() => inputRef.current?.focus());
-    } else {
-      setDraft("");
-      setError(null);
-      setSending(false);
-    }
-  }, [open]);
-
-  function close() {
-    setOpen(false);
-    setModalTarget(null);
-    setTyping(false);
-  }
-
-  async function submit() {
-    if (!modalTarget) return;
-    const text = draft.trim();
-    if (!text) return;
-    setSending(true);
-    setError(null);
+  const send = async () => {
+    if (!open || !text.trim()) return;
+    setBusy(true);
+    setReply(null);
     try {
-      const res = await fetch(`${AGENT_BASE_URL}/${modalTarget.species}/dialogue`, {
+      const res = await fetch(`${AGENT_BASE_URL}/${open}/dialogue`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ from: identity, text }),
+        body: JSON.stringify({ from: identity, text: text.trim() }),
       });
-      if (!res.ok) {
-        const body = await res.text();
-        throw new Error(`agent ${res.status}: ${body}`);
-      }
-      // agent has broadcast agent_speak — billboard's bubble will pick it up.
-      // close after a beat so the user sees the spinner resolve.
-      setTimeout(() => {
-        close();
-      }, 1000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-      setSending(false);
+      const body = (await res.json().catch(() => ({}))) as DialogueResponse;
+      const replyText = body.speakLog?.[body.speakLog.length - 1]?.text ?? "(silence)";
+      setReply(replyText);
+      // mirror into agentStateStore so the bubble shows up over the chibi too.
+      const existing = agentStateStore.get(open);
+      agentStateStore.upsert({
+        species: open,
+        identity: existing?.identity ?? open,
+        state: "talking",
+        mood: existing?.mood ?? "happy",
+        pos: existing?.pos,
+        speaking: replyText,
+        lastSpeakTs: Date.now(),
+      });
+      setTimeout(() => { setOpen(null); setText(""); setReply(null); setTyping(false); }, 1800);
+    } finally {
+      setBusy(false);
     }
-  }
+  };
 
   return (
     <>
-      {/* proximity hint — visible when in range, no modal open. */}
-      {nearest && !open ? (
-        <div
-          style={{
-            position: "fixed",
-            left: "50%",
-            top: "68%",
-            transform: "translateX(-50%)",
-            zIndex: 15,
-            padding: "8px 14px",
-            background: BRAND.asphalt,
-            color: BRAND.paper,
-            border: `1px solid ${BRAND.paper}`,
-            borderRadius: 999,
-            fontFamily: BRAND.pixelFont,
-            fontSize: 9,
-            letterSpacing: "0.04em",
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        >
-          press E to talk to {nearest.species}
+      {near && !open && (
+        <div style={{
+          position: "fixed", left: "50%", bottom: 100, transform: "translateX(-50%)",
+          padding: "8px 16px", background: "rgba(48,47,44,0.9)", color: "#EFEDE3",
+          border: "2px solid #EFEDE3", borderRadius: 999, fontSize: 13,
+          fontFamily: "ui-sans-serif", zIndex: 35,
+        }}>
+          press <strong>E</strong> to talk to <strong>{near}</strong>
         </div>
-      ) : null}
-
-      {open && modalTarget ? (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 30,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "rgba(48, 47, 44, 0.55)",
-          }}
-          onClick={(e) => {
-            // click outside the panel to close.
-            if (e.target === e.currentTarget) close();
-          }}
-        >
-          <div
-            style={{
-              minWidth: 420,
-              maxWidth: 520,
-              padding: 22,
-              background: BRAND.asphalt,
-              color: BRAND.paper,
-              border: `2px solid ${BRAND.paper}`,
-              borderRadius: 18,
-              boxShadow: `4px 4px 0 rgba(0,0,0,0.4)`,
-              fontFamily: BRAND.pixelFont,
-            }}
-          >
-            <div style={{ fontSize: 10, marginBottom: 12, letterSpacing: "0.04em" }}>
-              talking to {modalTarget.species} ({modalTarget.name})
-            </div>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                void submit();
+      )}
+      {open && (
+        <div style={{
+          position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)",
+          display: "grid", placeItems: "center", zIndex: 50,
+        }}>
+          <div style={{
+            background: "#EFEDE3", color: "#302F2C", padding: 24, borderRadius: 12,
+            border: "3px solid #302F2C", width: 480, fontFamily: "ui-sans-serif",
+          }}>
+            <h3 style={{ margin: "0 0 12px", fontFamily: "'Press Start 2P', monospace", fontSize: 12 }}>
+              TALK TO {open.toUpperCase()}
+            </h3>
+            <input
+              autoFocus
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") void send(); }}
+              placeholder="hey tiger, what's on the queue?"
+              disabled={busy}
+              style={{
+                width: "100%", padding: "10px 12px", fontSize: 14,
+                border: "2px solid #302F2C", borderRadius: 6, background: "#fff",
               }}
-            >
-              <input
-                ref={inputRef}
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                disabled={sending}
-                placeholder="say something…"
-                style={{
-                  width: "100%",
-                  padding: "10px 12px",
-                  background: BRAND.paper,
-                  color: BRAND.asphalt,
-                  border: `1px solid ${BRAND.paper}`,
-                  borderRadius: 10,
-                  fontFamily: BRAND.pixelFont,
-                  fontSize: 10,
-                  outline: "none",
-                }}
-              />
-            </form>
-            <div style={{ marginTop: 12, fontSize: 8, opacity: 0.7, minHeight: 14 }}>
-              {sending ? <Spinner label="talking…" /> : null}
-              {error ? <span style={{ color: "#ff9a9a" }}>{error}</span> : null}
-              {!sending && !error ? <span>enter to send · esc to leave</span> : null}
+            />
+            <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <button onClick={() => { setOpen(null); setText(""); setReply(null); setTyping(false); }} style={{ background: "transparent", border: 0, fontSize: 13, opacity: 0.6, cursor: "pointer" }}>
+                esc to cancel
+              </button>
+              <button onClick={send} disabled={busy || !text.trim()} style={{
+                padding: "8px 16px", background: "#302F2C", color: "#EFEDE3",
+                border: 0, borderRadius: 6, fontSize: 13, cursor: busy ? "wait" : "pointer",
+              }}>
+                {busy ? "thinking…" : "send →"}
+              </button>
             </div>
+            {reply && (
+              <div style={{ marginTop: 16, padding: 12, background: "rgba(48,47,44,0.05)", borderLeft: "3px solid #302F2C", fontSize: 13 }}>
+                <em>{open}:</em> {reply}
+              </div>
+            )}
           </div>
         </div>
-      ) : null}
+      )}
     </>
-  );
-}
-
-function Spinner({ label }: { label: string }) {
-  const [tick, setTick] = useState(0);
-  useEffect(() => {
-    const id = window.setInterval(() => setTick((t) => (t + 1) % 4), 250);
-    return () => window.clearInterval(id);
-  }, []);
-  const dots = ".".repeat(tick);
-  return (
-    <span>
-      {label}
-      {dots}
-    </span>
   );
 }

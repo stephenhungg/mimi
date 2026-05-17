@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json({
       ok: true,
-      team: { id: team.id, name: team.name, livekitRoom: team.livekitRoom, workspaceName: team.workspaceName },
+      team: { id: team.id, name: team.name, roomId: team.roomId, workspaceName: team.workspaceName },
     });
   } catch (e) {
     return NextResponse.json({ error: "create_failed", message: (e as Error).message }, { status: 500 });

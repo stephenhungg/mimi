@@ -124,6 +124,18 @@ export const TOOLS: Anthropic.Tool[] = [
     },
   },
   {
+    name: "stay_silent",
+    description:
+      "explicitly decide NOT to respond. use when the incoming team_chat or event isn't in your domain (e.g. tiger receives a calendar question). silence is a valid action — do not feel obligated to speak. always call this instead of forcing a generic acknowledgement.",
+    input_schema: {
+      type: "object",
+      properties: {
+        reason: { type: "string", description: "one-sentence why (lowercase). e.g. 'not a github topic, deferring to bunny'." },
+      },
+      required: ["reason"],
+    },
+  },
+  {
     name: "file_artifact",
     description:
       "save a durable artifact to notion. use for things worth remembering: a pr draft, a decision, a calendar entry, an email reply, a note.",
@@ -191,6 +203,22 @@ export async function runTool(
     }
     case "reset_pose": {
       return resetPose(ctx);
+    }
+    case "stay_silent": {
+      const input = rawInput as { reason?: string };
+      const reason = (input.reason ?? "no domain match").slice(0, 200);
+      process.stderr.write(`[${ctx.identity}] stay_silent: ${reason}\n`);
+      // log to notion events so the canonical trail captures the decision.
+      try {
+        await ctx.notion.appendEvent({
+          source: "manual",
+          type: "manual.poke",
+          ts: new Date().toISOString(),
+          summary: `${ctx.identity} stayed silent: ${reason}`,
+          agent: ctx.species,
+        });
+      } catch { /* non-fatal */ }
+      return `acknowledged silence: ${reason}`;
     }
     case "file_artifact": {
       const input = rawInput as FileArtifactInput;

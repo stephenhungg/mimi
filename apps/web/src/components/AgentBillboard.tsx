@@ -27,7 +27,7 @@ interface AgentBillboardProps {
 useTexture.preload(PRELOAD_URLS);
 
 // sprite billboard for an agent. owns its own bob + texture swap, but does not
-// own state — parent (room / livekit listener) decides `state`/`speaking`.
+// own state — parent (room / poll listener) decides `state`/`speaking`.
 export function AgentBillboard({
   species,
   state,

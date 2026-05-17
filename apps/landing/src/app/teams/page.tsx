@@ -11,7 +11,7 @@ interface Team {
   workspaceName: string;
   workspaceIcon?: string;
   isOwner: boolean;
-  livekitRoom: string;
+  roomId: string;
   createdAt: string;
 }
 
@@ -128,7 +128,7 @@ export default function TeamsPage() {
                   </div>
                 </div>
                 <div className="pixel" style={{ fontSize: 9, opacity: 0.5 }}>
-                  {t.isOwner ? "OWNER" : "MEMBER"} · {t.livekitRoom}
+                  {t.isOwner ? "OWNER" : "MEMBER"} · {t.roomId}
                 </div>
               </Link>
             ))}

@@ -1,34 +1,20 @@
 <claude-mem-context>
 # Memory Context
 
-# [mimi] recent context, 2026-05-17 4:48am PDT
+# [mimi] recent context, 2026-05-17 4:59am PDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (16,955t read) | 261,340t work | 94% savings
+Stats: 50 obs (16,236t read) | 263,162t work | 94% savings
 
 ### May 16, 2026
 S278 Write .claude/settings.json permission allowlist + fix Next.js landing page 500 (missing gsap vendor chunk) (May 16 at 6:42 PM)
 S277 Write .claude/settings.json permission allowlist + landing page Next.js 15 GSAP build error (May 16 at 6:42 PM)
 S279 Write .claude/settings.json + fix landing page Next.js build (500 from stale dev build) (May 16 at 6:55 PM)
 ### May 17, 2026
-231 4:23a 🔵 Hero Layout Patch Confirmed NOT Applied — Full Source State Captured
-232 " 🔵 Kawaiify Skill Loaded — 5-Step Workflow for Brand System Transformation
-233 4:24a ⚖️ Kawaiify Framer Template Clone for Agents Page
-234 " ⚖️ Mimi Kawaii Agents Page Redesign Plan
-235 " 🟣 Mimi Kawaii Brand Lock Document Created
-236 " 🔵 Agents Page Already Exists with Kawaii Structure
-239 4:25a 🔵 Mimi Root Page Structure — Full Landing Page Implemented
-240 4:26a 🟣 Agents Page Framer Clone Kawaiified — Data, Hero, Nav, and Work Grid Rewritten
-241 " 🟣 Agents Page Lower Sections Fully Kawaiified — Services, Clients, Final, Footer
-242 4:27a 🔵 Agents Page Final State Verified — No Framer Remnants, Full GSAP Architecture Intact
-243 " 🟣 Kawaii Palette Applied to Tailwind Config and Global CSS
-244 " 🔵 Lint and Typecheck Pass Clean After Kawaiification
-245 4:28a 🔵 Production Build Passes — All Routes Build Clean in 16.5s
-246 " 🔵 Full Route Map Revealed on Clean Build — API Routes and /onboard Exist
-247 " 🔵 All Required Kawaii Image Assets Present in public/
+247 4:28a 🔵 All Required Kawaii Image Assets Present in public/
 248 4:29a 🔵 Visual Audit Results — Two Issues Found: Nav Transform Bug and Hover Inset Not Triggering
 249 " 🟣 User Requested Cute Fonts Addition
 250 4:30a 🔵 Mimi Landing App Font System Architecture
@@ -64,6 +50,20 @@ S279 Write .claude/settings.json + fix landing page Next.js build (500 from stal
 286 4:42a ✅ Kawaiify Pass Fully Verified — Todo Updated with Root Route and ESLint Confirmations
 287 4:43a 🔵 Kawaiify Pass — Full Diff Stats: 527 Insertions, 233 Deletions Across 5 Files
 288 4:46a 🟣 Kawaiify Pass Committed — feat: kawaiify agents page with Fredoka/Nunito fonts and mimi brand content
+289 4:47a 🔵 Tailwind `font-display` Class Confirmed Present in SSR HTML Output
+290 4:48a 🔵 Mimi Public Asset Inventory — 12 PNGs Confirmed in apps/landing/public
+291 4:49a 🔵 Agents Page Component Architecture — Decomposed into 6 Sub-components with GSAP/ScrollSmoother
+292 " 🔵 Landing App Has 4-Step Onboarding Flow and Post-OAuth Connected Page
+293 " 🔵 Comparative Rating Request for Kawaiified Landing Pages
+294 4:51a 🔵 Mimi Project Structure: Monorepo with Landing + Web Apps
+295 4:53a 🔵 kawaiify-design Codex Skill Loaded for Mimi Design Review
+296 " 🔵 Mimi Brand Lock: Two Divergent BRAND.md Files Exist
+297 " 🔵 Mimi Landing Page: Full History of Kawaiify + agents.framer.website Clone
+298 4:54a ⚖️ Cuteness Overload Maxx — Project Intent Established
+299 " 🟣 Cuteness Overloadmaxx Pass — Task Plan Written to tasks/todo.md
+300 4:55a 🔵 Mimi Project File Structure and Tailwind Config Audited
+301 4:58a 🟣 Mimi Agents Page Fully Rebuilt as Mascot-Led Kawaii Landing
+302 4:59a 🟣 User Requested Explanation of What Was Shipped
 
-Access 261k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 263k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>
