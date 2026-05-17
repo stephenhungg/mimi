@@ -1,20 +1,19 @@
 <claude-mem-context>
 # Memory Context
 
-# [mimi] recent context, 2026-05-17 4:44am PDT
+# [mimi] recent context, 2026-05-17 4:48am PDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (17,102t read) | 264,071t work | 94% savings
+Stats: 50 obs (16,955t read) | 261,340t work | 94% savings
 
 ### May 16, 2026
 S278 Write .claude/settings.json permission allowlist + fix Next.js landing page 500 (missing gsap vendor chunk) (May 16 at 6:42 PM)
 S277 Write .claude/settings.json permission allowlist + landing page Next.js 15 GSAP build error (May 16 at 6:42 PM)
 S279 Write .claude/settings.json + fix landing page Next.js build (500 from stale dev build) (May 16 at 6:55 PM)
 ### May 17, 2026
-230 3:51a ⚖️ Pivot: Kawaiify Framer Template Clone for Mimi/Agents Page
 231 4:23a 🔵 Hero Layout Patch Confirmed NOT Applied — Full Source State Captured
 232 " 🔵 Kawaiify Skill Loaded — 5-Step Workflow for Brand System Transformation
 233 4:24a ⚖️ Kawaiify Framer Template Clone for Agents Page
@@ -64,6 +63,7 @@ S279 Write .claude/settings.json + fix landing page Next.js build (500 from stal
 285 " 🔵 Full Agents Page HTML Confirmed in SSR — Mimi Content Verified Live
 286 4:42a ✅ Kawaiify Pass Fully Verified — Todo Updated with Root Route and ESLint Confirmations
 287 4:43a 🔵 Kawaiify Pass — Full Diff Stats: 527 Insertions, 233 Deletions Across 5 Files
+288 4:46a 🟣 Kawaiify Pass Committed — feat: kawaiify agents page with Fredoka/Nunito fonts and mimi brand content
 
-Access 264k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 261k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>

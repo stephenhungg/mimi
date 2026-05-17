@@ -1,57 +1,46 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useGLTF } from "@react-three/drei";
-import { BRAND } from "@mimi/types";
+import { BRAND, SPECIES_DESK } from "@mimi/types";
 import type { Species } from "@mimi/types";
-import { AgentBillboard } from "../components/AgentBillboard";
+import { AgentMesh } from "../components/AgentMesh";
 import { PlayerController } from "../components/PlayerController";
-import { RemotePeers } from "../components/RemotePeers";
-import { playerPosStore, useMimiRoomContext, trainerCardStore } from "../lib/room-context";
+import { V1_AGENTS } from "../lib/agents";
+import { trainerCardStore } from "../lib/room-context";
 
 const PAPER = BRAND.paper;
 
 const MODEL_URL = "/models/scene.gltf";
 
-// 5 agents arranged on a circle of radius 2.5 at y=0. once the model's
-// node names + bounds are visible in the console (see traverse below),
-// these can be retuned to land each agent inside its intended room.
+function deskPosition(species: Species): [number, number, number] {
+  const [x, z] = SPECIES_DESK[species];
+  return [x, 0, z];
+}
+
 // `identity` is the trainer-card key — dog opens as "mimi".
 const AGENT_LAYOUT: {
   species: Species;
-  name: string;
   identity: string;
   position: [number, number, number];
 }[] = [
-  { species: "dog",     name: "mimi.",   identity: "mimi",    position: [0, 0, 0] },
-  { species: "tiger",   name: "tiger",   identity: "tiger",   position: [2.5, 0, 0] },
-  { species: "otter",   name: "otter",   identity: "otter",   position: [0.77, 0, 2.38] },
-  { species: "bunny",   name: "bunny",   identity: "bunny",   position: [-2.02, 0, 1.47] },
-  { species: "giraffe", name: "giraffe", identity: "giraffe", position: [-2.02, 0, -1.47] },
+  { species: "dog", identity: "mimi", position: deskPosition("dog") },
+  { species: "tiger", identity: "tiger", position: deskPosition("tiger") },
+  { species: "otter", identity: "otter", position: deskPosition("otter") },
+  { species: "bunny", identity: "bunny", position: deskPosition("bunny") },
+  { species: "giraffe", identity: "giraffe", position: deskPosition("giraffe") },
 ];
 
 interface RoomProps {
   localIdentity: string;
 }
 
-export function Room({ localIdentity }: RoomProps) {
+export function Room({ localIdentity: _localIdentity }: RoomProps) {
   const { scene } = useGLTF(MODEL_URL);
-  const { peers } = useMimiRoomContext();
 
   useEffect(() => {
     scene.traverse((node) => {
       console.log("[rooms.glb]", node.type, node.name);
     });
   }, [scene]);
-
-  // which species are "live" — meaning at least one agent broadcast has
-  // arrived for them. for those we skip the static placeholder and let
-  // RemotePeers render the real, state-driven billboard instead.
-  const liveAgentSpecies = useMemo(() => {
-    const set = new Set<Species>();
-    for (const peer of peers.values()) {
-      if (peer.kind === "agent" && peer.species) set.add(peer.species);
-    }
-    return set;
-  }, [peers]);
 
   return (
     <>
@@ -74,42 +63,19 @@ export function Room({ localIdentity }: RoomProps) {
 
       <primitive object={scene} />
 
-      {/* placeholder agents — only render when no live broadcast for that species.
-       *  click → open trainer card via the shared store (works across canvas/dom). */}
-      {AGENT_LAYOUT.map(({ species, name, identity, position }) =>
-        liveAgentSpecies.has(species) ? null : (
-          <AgentBillboard
-            key={species}
-            species={species}
-            state="idle"
-            name={name}
-            position={position}
-            onClick={() => trainerCardStore.open({ species, identity })}
-          />
-        ),
-      )}
-
-      {/* real remote peers — humans + agents — rendered with smooth lerp. */}
-      <RemotePeers localIdentity={localIdentity} />
+      {/* config-driven agent meshes. click opens the trainer card via the shared store. */}
+      {AGENT_LAYOUT.map(({ species, identity, position }) => (
+        <AgentMesh
+          key={species}
+          cfg={V1_AGENTS[species]}
+          position={position}
+          onClick={() => trainerCardStore.open({ species, identity })}
+        />
+      ))}
 
       <PlayerController />
-      <PresencePump localIdentity={localIdentity} />
     </>
   );
-}
-
-// inside-canvas helper that pulls the player's pose from the store and pushes
-// it to the livekit hook's publishLocalPos. PlayerController writes to
-// playerPosStore every frame; this just forwards each tick to the hook, which
-// throttles the actual wire broadcasts internally.
-function PresencePump({ localIdentity: _localIdentity }: { localIdentity: string }) {
-  const { publishLocalPos } = useMimiRoomContext();
-  useEffect(() => {
-    return playerPosStore.subscribe((p) => {
-      publishLocalPos({ x: p.x, z: p.z, rot: p.rot });
-    });
-  }, [publishLocalPos]);
-  return null;
 }
 
 useGLTF.preload(MODEL_URL);

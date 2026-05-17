@@ -148,10 +148,21 @@ remaining fidelity notes:
 
 ## web modular avatar system
 
-- [ ] read `docs/AVATAR-SYSTEM.md` end to end.
-- [ ] download one base humanoid model to `apps/web/public/models/base/mimi_base_v1.glb`.
-- [ ] add `apps/web/src/lib/agents.ts` with the spec's 5 config rows.
-- [ ] add `apps/web/src/components/AgentMesh.tsx` for cloned, tinted, animated agent instances.
-- [ ] replace `AgentBillboard` placeholders in `apps/web/src/scenes/Room.tsx` with `AgentMesh`.
-- [ ] run `tsc`/`vite build`, fix failures, and record evidence.
+- [x] read `docs/AVATAR-SYSTEM.md` end to end.
+- [x] download one base humanoid model to `apps/web/public/models/base/mimi_base_v1.glb`.
+- [x] add `apps/web/src/lib/agents.ts` with the spec's 5 config rows.
+- [x] add `apps/web/src/components/AgentMesh.tsx` for cloned, tinted, animated agent instances.
+- [x] replace `AgentBillboard` placeholders in `apps/web/src/scenes/Room.tsx` with `AgentMesh`.
+- [x] run `tsc`/`vite build`, fix failures, and record evidence.
 - [ ] commit and push the requested files.
+
+### avatar system verification notes
+
+- read all 231 lines of `docs/AVATAR-SYSTEM.md`.
+- searched the zero-auth chibi options; used the explicit `Soldier.glb` fallback because mixamo/ready-player-me are auth-gated and quaternius cc0 packs are not a direct glb fit for tonight.
+- `apps/web/public/models/base/mimi_base_v1.glb` is 2.1mb and exposes embedded clips: `Idle`, `Run`, `TPose`, `Walk`.
+- skipped `apps/web/public/models/animations/mimi_animations.glb` per the fallback rule because the base has baked clips.
+- `/Users/stephenhung/.bun/bin/bun run --cwd apps/web typecheck` passed.
+- `/Users/stephenhung/.bun/bin/bun run --cwd apps/web build` passed; vite built 601 modules.
+- `curl -I http://127.0.0.1:5173/` returned `200`; `curl -I http://127.0.0.1:5173/models/base/mimi_base_v1.glb` returned `200` with `Content-Type: model/gltf-binary`.
+- headed Chrome loaded `http://127.0.0.1:5173/` and rendered the 3D room HUD/scene; headless Chrome screenshot did not render WebGL, so it is not used as visual evidence.

@@ -1,4 +1,5 @@
 import { useAnimations, useGLTF } from "@react-three/drei";
+import type { ThreeEvent } from "@react-three/fiber";
 import { useEffect, useMemo } from "react";
 import {
   Box3,
@@ -68,12 +69,12 @@ export function AgentMesh({ cfg, position, onClick }: AgentMeshProps) {
       object={avatar}
       position={position}
       dispose={null}
-      onClick={(event) => {
+      onClick={(event: ThreeEvent<MouseEvent>) => {
         if (!onClick) return;
         event.stopPropagation();
         onClick();
       }}
-      onPointerOver={(event) => {
+      onPointerOver={(event: ThreeEvent<PointerEvent>) => {
         if (!onClick) return;
         event.stopPropagation();
         document.body.style.cursor = "pointer";
