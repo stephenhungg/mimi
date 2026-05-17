@@ -1,5 +1,0 @@
-{
-  "/api/agent/[species]/[action]/route": "app/api/agent/[species]/[action]/route.js",
-  "/api/team-chat/route": "app/api/team-chat/route.js",
-  "/page": "app/page.js"
-}

@@ -30,3 +30,6 @@ tasks/artifacts/
 .claude/
 .vercel
 .env*.local
+
+# next.js stale build dirs (created by auto-stash on dev-server crashes)
+apps/landing/.next-stale-*
