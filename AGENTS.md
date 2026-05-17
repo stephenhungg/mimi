@@ -1,40 +1,20 @@
 <claude-mem-context>
 # Memory Context
 
-# [mimi] recent context, 2026-05-17 5:07am PDT
+# [mimi] recent context, 2026-05-17 5:17am PDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (18,952t read) | 754,506t work | 97% savings
+Stats: 50 obs (18,094t read) | 666,605t work | 97% savings
 
 ### May 16, 2026
 S278 Write .claude/settings.json permission allowlist + fix Next.js landing page 500 (missing gsap vendor chunk) (May 16 at 6:42 PM)
 S277 Write .claude/settings.json permission allowlist + landing page Next.js 15 GSAP build error (May 16 at 6:42 PM)
-S279 Write .claude/settings.json + fix landing page Next.js build (500 from stale dev build) (May 16 at 6:55 PM)
+S279 Write .claude/settings.json + fix landing page Next.js build (500 from stale dev build) (May 16 at 6:54 PM)
 ### May 17, 2026
-286 4:42a ✅ Kawaiify Pass Fully Verified — Todo Updated with Root Route and ESLint Confirmations
-287 4:43a 🔵 Kawaiify Pass — Full Diff Stats: 527 Insertions, 233 Deletions Across 5 Files
-288 4:46a 🟣 Kawaiify Pass Committed — feat: kawaiify agents page with Fredoka/Nunito fonts and mimi brand content
-289 4:47a 🔵 Tailwind `font-display` Class Confirmed Present in SSR HTML Output
-290 4:48a 🔵 Mimi Public Asset Inventory — 12 PNGs Confirmed in apps/landing/public
-291 4:49a 🔵 Agents Page Component Architecture — Decomposed into 6 Sub-components with GSAP/ScrollSmoother
-292 " 🔵 Landing App Has 4-Step Onboarding Flow and Post-OAuth Connected Page
-293 " 🔵 Comparative Rating Request for Kawaiified Landing Pages
-294 4:51a 🔵 Mimi Project Structure: Monorepo with Landing + Web Apps
-295 4:53a 🔵 kawaiify-design Codex Skill Loaded for Mimi Design Review
-296 " 🔵 Mimi Brand Lock: Two Divergent BRAND.md Files Exist
-297 " 🔵 Mimi Landing Page: Full History of Kawaiify + agents.framer.website Clone
-298 4:54a ⚖️ Cuteness Overload Maxx — Project Intent Established
-299 " 🟣 Cuteness Overloadmaxx Pass — Task Plan Written to tasks/todo.md
-300 4:55a 🔵 Mimi Project File Structure and Tailwind Config Audited
-301 4:58a 🟣 Mimi Agents Page Fully Rebuilt as Mascot-Led Kawaii Landing
-302 4:59a 🟣 User Requested Explanation of What Was Shipped
-303 " ⚖️ LiveKit Purge Plan Initiated in Mimi Project
-305 " 🟣 Mimi Agents CSS Design System — Full Kawaii Token Sheet Written
-304 " 🔵 Mimi Repo LiveKit Purge State: Partial Removal with Regression
-308 " 🟣 LiveKit Replaced with Notion Polling Architecture in Mimi
+308 4:59a 🟣 LiveKit Replaced with Notion Polling Architecture in Mimi
 309 " 🟣 AgentMesh System Built with 3D Avatar Instances
 306 5:00a 🔵 Build Passes Clean — Zero TypeScript and ESLint Errors After Cuteness Overloadmaxx Rewrite
 307 " 🔵 Pre-existing TypeScript Error in .next/types for Missing agent-state Route
@@ -64,6 +44,27 @@ S279 Write .claude/settings.json + fix landing page Next.js build (500 from stal
 333 " ✅ Mimi Repo Fully Synced: HEAD = origin/main at 2081dd5
 335 5:05a ⚖️ Greenfield "Cuteness Overload" Project Initiated
 336 5:06a 🔵 mimi. — 3D Agent Workspace for Notion Landing Page
+337 " 🔵 User Wants GSAP Assets, Downloads Audit, Smooth Scrolling, and Higgsfield MCP Integration
+338 5:10a 🔵 User Request: GSAP Assets, Downloads Scan, Smooth Scrolling, Higgsfield MCP Integration
+339 " 🔵 Higgsfield/Z-Image MCP Token Expired on mimi. Project
+340 " 🔵 GSAP Club Plugins Already Installed in mimi. Landing App
+S325 GSAP plugin discovery, smooth scrolling setup, and Higgsfield MCP image generation for mimi. landing page (May 17 at 5:10 AM)
+341 5:11a 🔵 Higgsfield MCP Fully Wired in mimi. Project with Extensive Tool Surface
+342 " 🔵 Higgsfield Auth Token Not in Environment — Stored in ~/.codex/auth.json
+343 5:12a 🔵 Higgsfield MCP Configured via Remote URL in ~/.codex/config.toml
+344 " 🔵 No Higgsfield-Specific Config Files Found; Auth Entirely Remote Session-Based
+345 " 🔵 Codex CLI Has Native MCP Management and Login Subcommands
+346 5:13a 🔵 Higgsfield MCP Uses OAuth Auth — Re-login Required via `codex mcp login higgsfield`
+347 " 🔵 mimi. Landing App Source Structure and Current GSAP Implementation
+348 " 🟣 Higgsfield OAuth Re-login Flow Initiated via `codex mcp login higgsfield`
+349 5:14a 🟣 Higgsfield MCP OAuth Re-authentication Completed Successfully
+350 " 🔵 Higgsfield Balance Check Fails Post-Reauth — Server-Side Error
+351 " 🔵 Higgsfield MCP Uses streamable_http Transport with No Bearer Token
+352 5:15a 🔵 Higgsfield Account Active on Pro Plan — Workspace and Models Confirmed
+353 5:16a 🔵 Higgsfield generate_image Still Failing with Generic Error Despite Valid Auth
+354 " ⚖️ Autonomous Audit Session Initiated on Mimi Repo
+355 " 🔵 Mimi Repo State: 1 Ahead of Origin with Untracked Worker Rewrites and New Commit
+356 5:17a 🔵 Higgsfield Account-Level API Endpoints Failing — Likely Zero Credits or Account Issue
 
-Access 755k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 667k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>

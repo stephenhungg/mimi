@@ -1,0 +1,38 @@
+{
+  "version": "1",
+  "environment": "prod",
+  "workspaceId": "b1cfbde2-3a33-49b4-9a05-4374f236e959",
+  "workerId": "019e3311-67a4-7447-abac-1d489cae8757",
+  "workers": [
+    {
+      "name": "mimi-events",
+      "entry": "mimi-events/index.ts",
+      "description": "central event ingestion + agent fan-out"
+    },
+    {
+      "name": "mimi-github-bridge",
+      "entry": "mimi-github-bridge/index.ts",
+      "description": "github webhook receiver (HMAC verified)"
+    },
+    {
+      "name": "mimi-overnight-pulse",
+      "entry": "mimi-overnight-pulse/index.ts",
+      "description": "30-min agent pacing pulse"
+    },
+    {
+      "name": "mimi-thumbnail-render",
+      "entry": "mimi-thumbnail-render/index.ts",
+      "description": "live SVG pixel-art thumbnail of the room"
+    },
+    {
+      "name": "mimi-mcp-server",
+      "entry": "mimi-mcp-server/index.ts",
+      "description": "MCP server exposing mimi. tools to any external AI"
+    },
+    {
+      "name": "mimi-notion-agents",
+      "entry": "mimi-notion-agents/index.ts",
+      "description": "sponsor flex: wraps the official notion-agents-sdk-js so mimi. can summon notion-hosted custom agents"
+    }
+  ]
+}

@@ -2,6 +2,12 @@
 .env
 .env.local
 .env.*.local
+.env-tmp/
+**/.env
+**/.env.*
+**/.env-tmp/
+!.env.example
+!**/.env.example
 
 # deps + build
 node_modules/

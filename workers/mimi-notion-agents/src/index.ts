@@ -22,8 +22,8 @@ export default worker;
 const NOTION_VERSION = "2025-09-03";
 
 function notionToken(): string {
-	const tok = process.env.NOTION_TOKEN ?? process.env.NOTION_API_TOKEN;
-	if (!tok) throw new Error("mimi-notion-agents: missing NOTION_TOKEN / NOTION_API_TOKEN");
+	const tok = process.env.MIMI_NOTION_TOKEN ?? process.env.NOTION_API_TOKEN;
+	if (!tok) throw new Error("mimi-notion-agents: missing MIMI_NOTION_TOKEN / NOTION_API_TOKEN");
 	return tok;
 }
 

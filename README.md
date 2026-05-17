@@ -1,61 +1,64 @@
 # mimi.
 
-> the 3D agent workspace for notion. chibi animals watching your tools. one cozy room. notion is the ground truth.
+> **mimi. — the 3D agent workspace for notion.**
+> chibi animals watching your tools. one cozy room. notion is the ground truth.
+
+[![demo video](./design/generated/hero.png)](https://youtu.be/MIMI_DEMO_PLACEHOLDER)
+
+**[▶ 1-min demo](https://youtu.be/MIMI_DEMO_PLACEHOLDER)** · **[live → mimi.kalilabs.ai](https://mimi.kalilabs.ai)** · **[architecture](./docs/ARCHITECTURE.md)** · **[system model](./docs/SYSTEM-MODEL.md)** · **[pitch](./docs/PITCH.md)**
 
 built for the [notion developer platform hackathon](https://luma.com/fyuf7), may 16-17 2026.
 
-## what is this
+---
 
-mimi. is a two-layer agent workspace:
+## what it is, in 10 seconds
 
-- **layer A — notion (dashboard)**: open notion. a live svg thumbnail of your team's 3D room renders inline, with the events / residents / artifacts dbs as inline views. judges scroll notion and the product is right there.
-- **layer B — 3D world (live space)**: click the thumbnail → vite + r3f + livekit drops you into a first-person multiplayer room. chibi animal agents at their themed corners; tiger watches github, otter watches gmail, bunny watches calendar, mimi (the dog) dispatches, giraffe summarizes notion meeting notes.
+a real notion app. click install → mimi auto-provisions 5 dbs in your workspace → 5 chibi animal agents start watching your tools (github, gmail, calendar, notion notes) → they show up in a first-person 3D room and **talk to each other** about what they see. notion is the canonical state. every action a chibi takes writes back to a notion row in real time.
 
-every action in 3D writes back to notion as canonical state. agents speak in **animalese** (procedural chirp). when an agent rate-limits or crashes, it **curls into a slime puddle** — failure is a first-class state.
+push a commit. within 2 seconds: **tiger** jolts in the 3D room, walks to its corner, slams the keyboard, chirps in animalese, files an artifact. **mimi** (the dog dispatcher) calls **otter** over to weigh in. they argue. it ends up in notion.
 
-**brand**: asphalt `#302F2C` + paper `#EFEDE3` (warm undertones, never pure b/w). animal-crossing-coded sticker art. pokemon gen-1 trainer cards for agent profiles. full spec in [`PROJECT.md`](./PROJECT.md), [`design/BRAND.md`](./design/BRAND.md), [`RESEARCH.md`](./RESEARCH.md).
+## the echo chamber of doom
 
-## repo layout
+most "ai agent" demos are one agent answering one user. mimi. is **agents talking to each other**.
 
-```
-apps/
-  web/            → 3D world client (vite + r3f + livekit)
-  landing/        → next.js marketing site + token route + agent router api
+mimi (the dog) is the orchestrator — per the anthropic + langchain 2026 multi-agent playbook. when a real-world event lands (commit pushed, email arrived, meeting starting), mimi dispatches the right specialist, the specialist drafts a take, mimi pings a second opinion, they riff, they escalate. **8-round soft cap** before mimi cuts the room and files the consensus to notion. agents bicker. agents one-up each other. one of them inevitably curls into a slime puddle from a 429 and the others have to carry on without it.
 
-agents/
-  runtime/        → per-agent runtime (bun + claude api + livekit broadcaster)
-    personas/     → per-species persona configs + .md system prompts
+it's the part of the product judges remember. the chibi voices in procedural animalese arguing with each other is unhinged in the best way.
 
-workers/                          (deployed via ntn workers deploy)
-  mimi-events/                    → central event ingestion → events db + fan-out
-  mimi-github-bridge/             → github webhook (HMAC-verified) → mimi-events
-  mimi-overnight-pulse/           → 30-min agent pacing pulse
-  mimi-thumbnail-render/          → live svg pixel-art thumbnail of the room
-  mimi-mcp-server/                → MCP exposing mimi. tools to any external AI
-  mimi-notion-agents/             → SPONSOR FLEX — wraps notion-agents-sdk-js
-  _shared/                        → inlined types + helpers (workspace npm boundary)
+## the residents
 
-packages/
-  types/          → shared TS (species, broadcasts, db rows, brand constants)
-  notion-client/  → typed wrapper over @notionhq/client v2
-  animalese/      → procedural chirp synth (web audio, per-species voice cluster)
+| chibi | watches | persona |
+|---|---|---|
+| **tiger** | github (push, PRs, issues) | dry, terse, codes through panic |
+| **otter** | gmail | warm, sleepy, never opens a thread cold |
+| **bunny** | calendar | chipper, twitchy, will not let you miss standup |
+| **mimi** (dog) | everything — dispatcher | leader, soft authority, runs the room |
+| **giraffe** | notion meeting notes | thoughtful, distills 40 lines into 4 |
 
-design/
-  generated/      → higgsfield-generated brand assets
-  BRAND.md        → palette + mascot + line treatment lock
+## killer features
 
-scripts/
-  provision-notion-dbs.ts  → idempotent: creates the 5 notion dbs
-  seed-demo.ts             → lived-in demo state before recording
-  poke-agent.ts            → fires synthetic external events at each species
-  check-env.ts             → preflight validator (run before demo)
+1. **real notion oauth** — install button → mimi provisions 5 dbs (residents, events, artifacts, conversations, agent_memory) in *your* workspace. no manual setup.
+2. **teams + invite links** — multi-tenant from day one. invitees don't need a notion account. one host, many chibis in the room.
+3. **claude sonnet 4.6 tool-use** — per-species personas (.md system prompts), 7 tools, real loop.
+4. **the echo chamber of doom** (see above) — orchestrated multi-agent group chat.
+5. **6 notion workers** including the sponsor flex: `mimi-notion-agents` wraps `notion-agents-sdk-js` end-to-end.
+6. **failure as first-class state** — rate-limited agents `curl_up()` into a slime puddle. mimi walks over and checks on them. we celebrate failure on screen.
+7. **3D first-person room** — vite + r3f with notion-backed agent state polling. animalese voice synth (procedural chirp, no TTS). pokemon gen-1 trainer cards for each agent.
+8. **dual surface, one state** — the same world state renders in 3D and as a live svg pixel-art thumbnail inline on the notion dashboard page.
 
-docs/
-  ARCHITECTURE.md          → deep dive (judges)
-  DEMO-RUNBOOK.md          → pre-flight, launch order, 3-min loop, fallbacks
-  NOTION-PAGE-SETUP.md     → how to wire the notion dashboard page
-  SUBMISSION.md            → copy-paste-ready submission text
-```
+## tech stack
+
+| layer | tech |
+|---|---|
+| 3D client | vite · react 19 · @react-three/fiber · drei |
+| room state | notion events db · `/api/agent-state` polling · local shared stores |
+| voice | animalese — procedural chirp synth, per-species voice cluster, fully offline |
+| agent runtime | bun · @anthropic-ai/sdk (claude sonnet 4.6, tool-use loop) |
+| orchestrator | mimi-as-dispatcher group chat, 8-round soft cap |
+| workers | @notionhq/workers — 6 workers + MCP server + notion-agents-sdk-js wrapper |
+| notion api | @notionhq/client v2 (typed wrapper in `packages/notion-client`) |
+| landing + auth | next.js 15 on vercel · notion oauth · agent router |
+| brand | asphalt `#302F2C` + paper `#EFEDE3` — warm undertones, never pure b/w |
 
 ## quick start
 
@@ -63,17 +66,17 @@ docs/
 # 1 — install (root bun workspaces; workers/ uses npm via ntn)
 bun install
 
-# 2 — env (copy + fill: notion token, livekit keys, anthropic key, github webhook secret)
+# 2 — env (fill: notion oauth, anthropic, github webhook secret)
 cp .env.example .env.local
 $EDITOR .env.local
 
-# 3 — preflight (green checklist before you proceed)
+# 3 — preflight
 bun scripts/check-env.ts
 
 # 4 — provision the 5 notion dbs under NOTION_PARENT_PAGE_ID (idempotent)
 bun run provision:notion
 
-# 5 — seed demo state so notion looks lived-in
+# 5 — seed lived-in demo state
 bun run seed:demo
 
 # 6 — deploy workers (one-time per env)
@@ -87,40 +90,51 @@ cd workers && \
   cd ..
 
 # 7 — local dev (3+ terminals)
-bun run dev:landing                                  # next on :3000 (token + agent router)
-bun run dev:web                                      # vite on :5173 (3D client)
-AGENT_PORT=8081 bun run dev:tiger                    # tiger agent on :8081
-AGENT_PORT=8082 bun run dev:otter                    # (optional)
-AGENT_PORT=8083 bun run dev:bunny                    # (optional)
-AGENT_PORT=8084 bun run dev:dog                      # (optional)
+bun run dev:landing                            # next on :3000
+bun run dev:web                                # vite on :5173
+AGENT_PORT=8081 bun run dev:tiger              # tiger on :8081
+AGENT_PORT=8082 bun run dev:otter              # (optional, parallel)
+AGENT_PORT=8083 bun run dev:bunny
+AGENT_PORT=8084 bun run dev:dog
 
 # 8 — smoke test
-bun scripts/poke-agent.ts tiger                      # fire a fake github.push → tiger reacts
+bun scripts/poke-agent.ts tiger                # fake github.push → tiger reacts
 ```
 
-set `VITE_AGENT_BASE_URL=http://localhost:3000/api/agent` and the landing's
-agent router fans out by species (tiger=8081, otter=8082, …).
+set `VITE_AGENT_BASE_URL=http://localhost:3000/api/agent` so the landing's agent router fans out by species.
 
-## demo loop (3 min)
+## deploy
 
-per [`PROJECT.md`](./PROJECT.md) — the killshot beat is 1:30-2:00:
-push a real commit → tiger jolts in the 3D room → walks to its desk → keyboard-slam → animalese-chirps the diagnosis → files an artifact to notion → notion db row appears live. judges watch the whole chain in <2s.
+- **landing + agent router** → vercel (`vercel --prod` from `apps/landing`)
+- **6 workers** → `ntn workers deploy` (see step 6 above)
+- **notion oauth callback** → set to `https://mimi.kalilabs.ai/api/notion/callback`
+- **github webhook** → `https://<mimi-github-bridge>.ntn.workers/github`, HMAC secret in `.env`
 
-full [`docs/DEMO-RUNBOOK.md`](./docs/DEMO-RUNBOOK.md) covers pre-flight, launch order, per-beat fallbacks, and the 1-min cut.
+full pre-flight + fallback plan in [`docs/DEMO-RUNBOOK.md`](./docs/DEMO-RUNBOOK.md).
 
-## stack at a glance
+## repo layout
 
-| layer | tech |
-|---|---|
-| 3D client | vite, react 19, @react-three/fiber, drei, livekit-client |
-| multiplayer | livekit cloud (data channel — position + chat broadcasts) |
-| voice | animalese — procedural chirp synth, no TTS |
-| agent runtime | bun + @anthropic-ai/sdk (claude sonnet 4.6, tool-use loop) |
-| livekit broadcaster | livekit-server-sdk (RoomServiceClient.sendData, no participant) |
-| failure handling | curl_up() — broadcast state='down' + auto-recover, mimi walks over |
-| workers | @notionhq/workers (6 workers + MCP + notion-agents-sdk-js wrapper) |
-| notion api | @notionhq/client v2 (semantic typed wrapper in `packages/notion-client`) |
-| landing | next.js 15 (token mint + agent router + onboarding flow) |
+```
+apps/
+  web/            → 3D world client (vite + r3f + notion-backed polling)
+  landing/        → next.js: notion oauth + agent router
+agents/
+  runtime/        → per-agent runtime (bun + claude + notion-backed broadcaster)
+    personas/     → per-species .md system prompts
+workers/          → 6 notion workers (ntn workers deploy)
+packages/
+  types/          → shared TS (species, broadcasts, db rows)
+  notion-client/  → typed wrapper over @notionhq/client v2
+  animalese/      → procedural chirp synth (web audio)
+design/           → BRAND.md + higgsfield-generated assets
+scripts/          → provision-notion, seed-demo, poke-agent, check-env
+docs/             → ARCHITECTURE · SYSTEM-MODEL · PITCH · DEMO-RUNBOOK · DEMO-SCRIPT · SUBMISSION
+```
+
+## demo
+
+60-second cut: see [`docs/DEMO-SCRIPT.md`](./docs/DEMO-SCRIPT.md).
+3-minute walkthrough + fallbacks: [`docs/DEMO-RUNBOOK.md`](./docs/DEMO-RUNBOOK.md).
 
 ## team
 
@@ -128,9 +142,6 @@ full [`docs/DEMO-RUNBOOK.md`](./docs/DEMO-RUNBOOK.md) covers pre-flight, launch 
 - **maddy** — design, room aesthetic, demo narrative, on-stage
 - **tenz** — coordination, infra, decisions
 
-## hackathon ops
+## license
 
-- submission: sun may 17 **12pm PT** via cerebral valley
-- 1-min video is the gating artifact (block 11am-12pm sun)
-- all work timestamped in this repo during the event
-- MIT license
+MIT.

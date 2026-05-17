@@ -26,7 +26,7 @@ import {
 	type EventType,
 	type ResidentRow,
 	type Species,
-} from "../_shared/src/mimi.js";
+} from "./mimi.js";
 
 const worker = new Worker();
 export default worker;

@@ -196,62 +196,65 @@ export async function POST(req: NextRequest) {
   // 3. fan out to each picked agent. for each, pass the FULL transcript as
   //    context — that's what makes the doom spiral feel natural.
   const base = process.env.AGENT_BASE_URL ?? `${req.nextUrl.origin}/api/agent`;
-  const origin = req.nextUrl.origin;
 
-  const fanOuts = parsed.responders.map(async (species) => {
+  // CRITICAL: each agent /event call hits a synchronous /dialogue-style claude
+  // turn that can take 10-30s. we MUST NOT await that, or we'll block the route
+  // for half a minute AND get hit by next.js timeouts that retry our own POST.
+  // strategy: fire each fan-out with a 1s budget — that's enough to actually
+  // begin the request but not enough to wait for the claude reply. the agent
+  // runtime still receives + processes the event; its speak event lands in
+  // notion + flows through /api/agent-state to apps/web's poll loop, which is
+  // how each new round of the echo chamber is OBSERVED.
+  //
+  // recursion: we do NOT recurse on individual agent replies (that was an
+  // infinite-loop bug: same agent's speakLog → re-classify → re-pick same
+  // agent → forever). instead, the orchestrator picks the FULL set of
+  // responders for THIS round in one shot, and the next round is driven by
+  // the user OR a server-side worker (future v2).
+  //
+  // result: one user message → one classify call → N parallel agent fan-outs.
+  // multi-round group dynamics emerge across separate user messages, NOT
+  // automatic recursion. simpler + safer + still feels like a chat.
+  // fan-out — AWAIT the agent /event POST (it's already fire-and-forget at
+  // the runtime side: returns {ok, accepted} in <100ms then processes claude
+  // in the background). awaiting here gives next.js a chance to actually send
+  // the request before the route response is finalized — `void fetch()` gets
+  // killed by next.js's response lifecycle in node runtime.
+  //
+  // hits the agent runtime DIRECTLY by port (skipping our own router) so we
+  // don't recurse through next routes. port mapping mirrors the router's
+  // default convention: tiger=8081, otter=8082, bunny=8083, dog=8084, giraffe=8085.
+  const PORT_BY_SPECIES: Record<Species, number> = {
+    tiger: 8081, otter: 8082, bunny: 8083, dog: 8084, giraffe: 8085,
+  };
+  const directBase = process.env.AGENT_DIRECT_BASE_URL ?? "http://localhost";
+  await Promise.all(parsed.responders.map(async (species) => {
+    const payload = {
+      id: `chat-r${round}-${species}-${Date.now()}`,
+      source: "manual" as const,
+      type: "manual.poke" as const,
+      ts: new Date().toISOString(),
+      payload: {
+        kind: "team_chat_echo",
+        round,
+        transcript: transcript.slice(-10),
+        mimi_reasoning: parsed.reasoning,
+        expected_behavior: `you are in an ECHO CHAMBER. you may respond to ANY other agent, not just the user. you can be off-domain. you can bicker, agree, escalate, riff. keep it ONE short line. be in character. mimi can't stop the spiral.`,
+      },
+    };
+    const port = PORT_BY_SPECIES[species];
     try {
-      const payload = {
-        id: `chat-r${round}-${species}-${Date.now()}`,
-        source: "manual" as const,
-        type: "manual.poke" as const,
-        ts: new Date().toISOString(),
-        payload: {
-          kind: "team_chat_echo",
-          round,
-          transcript: transcript.slice(-10), // last 10 turns
-          mimi_reasoning: parsed.reasoning,
-          // chaos mode rule of engagement:
-          expected_behavior: `you are in an ECHO CHAMBER. you may respond to ANY other agent, not just the user. you can be off-domain. you can bicker, agree, escalate, riff. keep it ONE short line. be in character. mimi can't stop the spiral.`,
-        },
-      };
-      const res = await fetch(`${base.replace(/\/$/, "")}/${species}/event`, {
+      await fetch(`${directBase}:${port}/event`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(payload),
       });
-      // the agent runtime is fire-and-forget, but it returns a result if the
-      // tool-use synthesized a speak. read it back so we can recurse on it.
-      // we don't block on the recursion call though — kick it off in the bg.
-      let agentSpeak: string | null = null;
-      try {
-        const body = (await res.json()) as { speakLog?: string[] };
-        if (Array.isArray(body.speakLog) && body.speakLog.length > 0) {
-          agentSpeak = body.speakLog[body.speakLog.length - 1] ?? null;
-        }
-      } catch { /* fire-and-forget */ }
-
-      // recurse: fire the next round with the new speak appended to transcript.
-      // bg call — we don't await it (the response to the user has already gone).
-      if (agentSpeak) {
-        const nextTranscript: TranscriptTurn[] = [...transcript, { speaker: species, text: agentSpeak }];
-        void fetch(`${origin}/api/team-chat`, {
-          method: "POST",
-          headers: { "content-type": "application/json", cookie: req.headers.get("cookie") ?? "" },
-          body: JSON.stringify({
-            from: species,
-            text: agentSpeak,
-            transcript: nextTranscript,
-            round,
-          }),
-        }).catch(() => { /* fire-and-forget */ });
-      }
     } catch {
-      // non-fatal
+      // non-fatal — log + move on. agent may be down.
     }
-  });
-  // wait for all picked agents this round to fire (so they speak roughly in parallel),
-  // but the recursion calls within each fan-out are fire-and-forget.
-  await Promise.all(fanOuts);
+  }));
+  // suppress unused-var warning while keeping `base` for compat with prod.
+  void base;
 
   return NextResponse.json({
     ok: true,

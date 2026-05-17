@@ -8,7 +8,7 @@
 import { Worker, WebhookVerificationError } from "@notionhq/workers";
 import { j } from "@notionhq/workers/schema-builder";
 import type { JSONValue } from "@notionhq/workers/types";
-import { ENV, type EventType, type ExternalEvent } from "../_shared/src/mimi.js";
+import { ENV, type EventType, type ExternalEvent } from "./mimi.js";
 
 function asJson(v: unknown): JSONValue {
 	return JSON.parse(JSON.stringify(v)) as JSONValue;

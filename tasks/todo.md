@@ -184,3 +184,14 @@ remaining fidelity notes:
 - [x] rename team room metadata from provider-specific naming to `roomId`.
 - [x] remove provider references from source comments, docs, and persona examples.
 - [ ] run typecheck/build gates and push.
+
+## livekit purge fallout audit
+
+- [x] searched source, docs, package manifests, and lockfiles for stale livekit references.
+- [x] removed remaining livekit references from `README.md` and reframed the runtime as notion-backed polling/state.
+- [x] found and deleted `workers/.env-tmp/common`, which contained plaintext notion credentials.
+- [x] added repo ignore coverage for nested `.env`, `.env.*`, and `.env-tmp/` files while preserving `.env.example`.
+- [x] verified no obvious `ntn_...` token remains in searchable non-build files.
+- [x] ran typecheck gates for `apps/landing`, `apps/web`, and `agents/runtime`.
+- [ ] rotate the exposed notion credential that had been written to `workers/.env-tmp/common`.
+- [ ] decide whether to implement real queued echo-chamber recursion or downgrade the docs/comments to the current one-fanout behavior.
