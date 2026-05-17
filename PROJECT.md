@@ -10,6 +10,19 @@ Multiplayer communication is **text-based chat** in v1 (no voice). Agents speak 
 
 ---
 
+## Core mental model
+
+**1 Notion workspace = 1 mimi. house.**
+
+The Notion workspace is the unit of tenancy. Every workspace has exactly one mimi. house. The residents db in that workspace lists everyone (humans + agents) who lives in the house. The thumbnail rendered in Notion shows that house specifically. The 3D world is scoped to that house. Mimi. (the dog) is one per house — workspace-level oversight.
+
+This means:
+- Your personal notion workspace → your solo house
+- A shared team workspace → the shared house with assigned agents from each member
+- Joining a workspace = entering its house
+- Leaving a workspace = your chibi disappears from that house
+- No cross-workspace agent pollution by design
+
 ## The two layers
 
 ### Layer A: Notion-native thumbnails (the dashboard surface)
