@@ -94,6 +94,29 @@ Then for any shared workspace, you ASSIGN agents from your squad to participate.
 - Walking
 - Keyboard slam (bongo cat / laptop cat) when an agent is "working"
 - Talking pose (when in NPC dialogue with you)
+- **Curled-up puddle (when agent is down/errored/rate-limited)** — body becomes a chunky-outlined slime/jelly blob in the corner, color-matched to species, with a sad "..." thought puff above. Reference: maddy's green slime sketch. CRITICAL — this is how failure looks. Most demos hide failure. We celebrate it visually.
+
+**Agent profile card (LOCKED)**:
+Every agent in mimi. has a profile card summonable by clicking it in the 3D world or hovering it in the notion thumbnail. The card displays:
+- Identity: name, species, portrait, owner, assigned source
+- Mood: current emoji face (animal crossing sticker palette: happy / focused / sleepy / sad / panicked / sparkly / curled-up)
+- Vitals: status (idle/working/blocked/down), last action + timestamp, tasks claimed, tasks completed today
+- Resource gauges:
+  - Claude tokens used today (bar fill)
+  - Source API rate-limit headroom (e.g. "github API 78% remaining")
+  - "Compute" / busy gauge (symbolic — fun visual proxy for how loaded the agent is)
+  - Optional cheeky: "vibes" gauge based on failure rate
+- Memory snippet: last 1-2 lines from its notion-native memory journal
+- Link to its full agent_memory page
+- Owner flag: who assigned this agent ("yours" vs "team")
+Style: rounded corners, thick black outlines, soft animal crossing palette. Pokémon Stadium status screen meets AC villager profile.
+
+**Failure as a first-class state**: when an agent crashes, errors, times out, or hits a rate limit:
+- 3D world: chibi curls into the slime-puddle form in its themed corner
+- Notion thumbnail: pixel sprite collapses into a puddle in the same corner
+- Profile card mood: shifts to "down" with optional error text ("rate limit hit — recovering in 4m" / "anthropic api timeout — retrying")
+- mimi. (the dog) walks over and sits next to the down agent, animalese: "you good? take a sec." (optional polish)
+- Why this matters: judges WILL probe failure. This is the rubric-killing answer.
 
 ---
 
