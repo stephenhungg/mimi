@@ -273,6 +273,11 @@ video {
   transform: scale(1.24);
 }
 
+.agents-split-word {
+  display: inline-block;
+  will-change: transform;
+}
+
 .agents-sparkle {
   position: absolute;
   z-index: 0;
@@ -376,6 +381,46 @@ video {
   font-weight: 900;
   line-height: 1;
   padding: 9px 12px;
+}
+
+.agents-sticker-rail {
+  border-bottom: 3px solid var(--agents-ink);
+  background:
+    linear-gradient(90deg, var(--agents-paper), rgba(255, 250, 240, 0) 8%, rgba(255, 250, 240, 0) 92%, var(--agents-paper)),
+    var(--agents-soft);
+}
+
+.agents-rail-track {
+  will-change: transform;
+}
+
+.agents-rail-sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 250px;
+  border: 3px solid var(--agents-ink);
+  border-radius: 999px;
+  background: var(--agent-soft, var(--agents-cloud));
+  box-shadow: 5px 5px 0 rgba(48, 47, 44, 0.18);
+  padding: 8px 16px 8px 8px;
+}
+
+.agents-rail-sticker img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  border: 2px solid var(--agents-ink);
+  border-radius: 999px;
+  background: var(--agents-cloud);
+}
+
+.agents-rail-sticker span {
+  font-family: Fredoka, Nunito, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .agents-work-card {

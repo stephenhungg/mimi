@@ -14,7 +14,11 @@
 import { Worker } from "@notionhq/workers";
 import { j } from "@notionhq/workers/schema-builder";
 import type { JSONValue } from "@notionhq/workers/types";
-import { NotionAgentsClient } from "@notionhq/agents-client";
+// SDK source is vendored at ./agents-sdk/ (built from
+// github:makenotion/notion-agents-sdk-js). this avoids notion cloud build
+// pruning the github-source dep during `npm ci`. to refresh the vendored
+// copy, see workers/mimi-notion-agents/README.md.
+import { NotionAgentsClient } from "./agents-sdk/index.js";
 
 const worker = new Worker();
 export default worker;

@@ -6,8 +6,11 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import { SplitText } from "gsap/SplitText";
+import { CustomEase } from "gsap/CustomEase";
 
-gsap.registerPlugin(useGSAP, ScrollTrigger, ScrollSmoother);
+gsap.registerPlugin(useGSAP, ScrollTrigger, ScrollSmoother, ScrollToPlugin, SplitText, CustomEase);
 
 const media = {
   hero: "/hero.png",
@@ -219,6 +222,7 @@ export default function AgentsPage() {
     () => {
       const cleanup: Array<() => void> = [];
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const ease = CustomEase.create("mimiPop", "M0,0 C0.16,0.86 0.26,1.16 0.48,1.02 0.7,0.92 0.82,1 1,1");
       const smoother = reduceMotion
         ? undefined
         : ScrollSmoother.create({
@@ -229,15 +233,51 @@ export default function AgentsPage() {
             normalizeScroll: false,
             ignoreMobileResize: true
           });
+      let headlineSplit: { words: Element[]; revert: () => void } | undefined;
+
+      root.current?.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((link) => {
+        const onClick = (event: MouseEvent) => {
+          const hash = link.getAttribute("href");
+          if (!hash || hash === "#") return;
+
+          const target = root.current?.querySelector(hash);
+          if (!target) return;
+
+          event.preventDefault();
+          gsap.to(window, {
+            duration: 0.95,
+            ease: "power3.inOut",
+            scrollTo: {
+              y: target,
+              offsetY: 88
+            }
+          });
+          window.history.pushState(null, "", hash);
+        };
+
+        link.addEventListener("click", onClick);
+        cleanup.push(() => link.removeEventListener("click", onClick));
+      });
 
       if (reduceMotion) {
-        gsap.set(".agents-pop, .agents-reveal-up, .agents-wordmark-pop, .agents-scene-pop", {
+        gsap.set(".agents-pop, .agents-reveal-up, .agents-wordmark-pop, .agents-scene-pop, .agents-hero-headline", {
           autoAlpha: 1,
           y: 0,
           scale: 1,
           rotate: 0
         });
       } else {
+        const headline = root.current?.querySelector<HTMLElement>(".agents-hero-headline");
+        if (headline) {
+          headlineSplit = SplitText.create(headline, {
+            type: "words",
+            mask: "words",
+            aria: "auto",
+            wordsClass: "agents-split-word"
+          }) as { words: Element[]; revert: () => void };
+          gsap.set(headlineSplit.words, { yPercent: 108, rotate: 2.5 });
+        }
+
         gsap.set(".agents-pop", { autoAlpha: 0, y: 24, scale: 0.98 });
         gsap.set(".agents-motion-nav", { autoAlpha: 0, y: -14 });
         gsap.set(".agents-wordmark-pop", { autoAlpha: 0, y: 46, scale: 0.9, rotate: -2 });
@@ -245,10 +285,11 @@ export default function AgentsPage() {
         gsap.set(".agents-reveal-up", { autoAlpha: 0, y: 54, scale: 0.98 });
 
         gsap
-          .timeline({ defaults: { ease: "back.out(1.45)", duration: 0.8 } })
+          .timeline({ defaults: { ease, duration: 0.8 } })
           .to(".agents-motion-nav", { autoAlpha: 1, y: 0, duration: 0.52, ease: "power3.out" }, 0.05)
           .to(".agents-wordmark-pop", { autoAlpha: 1, y: 0, scale: 1, rotate: 0 }, 0.08)
           .to(".agents-scene-pop", { autoAlpha: 1, y: 0, scale: 1, rotate: 0 }, 0.2)
+          .to(headlineSplit?.words ?? [], { yPercent: 0, rotate: 0, stagger: 0.035, duration: 0.92 }, 0.18)
           .to(".agents-pop", { autoAlpha: 1, y: 0, scale: 1, stagger: 0.06 }, 0.26);
 
         gsap.to(".agents-float", {
@@ -270,6 +311,13 @@ export default function AgentsPage() {
           yoyo: true,
           ease: "sine.inOut",
           stagger: 0.18
+        });
+
+        gsap.to(".agents-rail-track", {
+          xPercent: -50,
+          duration: 18,
+          ease: "none",
+          repeat: -1
         });
 
         gsap.to(".agents-hero-media", {
@@ -469,6 +517,7 @@ export default function AgentsPage() {
 
       return () => {
         cleanup.forEach((remove) => remove());
+        headlineSplit?.revert();
         smoother?.kill();
       };
     },
@@ -482,6 +531,7 @@ export default function AgentsPage() {
         <main className="agents-smooth-content">
           <Hero />
           <ProofStrip />
+          <StickerRail />
           <FeaturedWork />
           <Squad />
           <Workflow activeService={activeService} onService={setActiveService} />
@@ -533,7 +583,7 @@ function Hero() {
           <div className="agents-wordmark-pop agents-wordmark-frame">
             <img src={media.wordmark} alt="mimi." />
           </div>
-          <p className="agents-pop mt-5 max-w-[540px] font-display text-[clamp(2.25rem,8vw,5.9rem)] font-bold leading-[0.88] tracking-normal">
+          <p className="agents-hero-headline mt-5 max-w-[540px] font-display text-[clamp(2.25rem,8vw,5.9rem)] font-bold leading-[0.88] tracking-normal">
             your tiny ops room for noisy tools.
           </p>
           <p className="agents-pop mt-5 max-w-[520px] font-inter text-[18px] font-bold leading-[1.35] text-agents-gray md:text-[22px]">
@@ -594,6 +644,27 @@ function ProofStrip() {
             </span>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+function StickerRail() {
+  const railItems = [...agents, ...agents];
+
+  return (
+    <section className="agents-sticker-rail overflow-hidden py-4">
+      <div className="agents-rail-track flex w-max gap-3 px-3">
+        {railItems.map((agent, index) => (
+          <div
+            key={`${agent.id}-${index}`}
+            className="agents-rail-sticker"
+            style={{ "--agent": agent.accent, "--agent-soft": agent.soft } as CuteStyle}
+          >
+            <img src={agent.image} alt="" />
+            <span>{agent.role}</span>
+          </div>
+        ))}
       </div>
     </section>
   );
