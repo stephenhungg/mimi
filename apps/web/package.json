@@ -15,6 +15,7 @@
     "@mimi/types": "workspace:*",
     "@react-three/drei": "^10",
     "@react-three/fiber": "^9",
+    "livekit-client": "^2.5.7",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "three": "^0.169.0"

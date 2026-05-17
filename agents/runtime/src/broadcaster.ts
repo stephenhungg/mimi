@@ -1,21 +1,24 @@
-// agent broadcaster — formerly a livekit data-channel publisher. livekit is
-// removed in v1: mimi. uses notion as the canonical state surface, and
-// apps/web polls a derived /api/agent-state endpoint instead of subscribing
-// to a realtime channel. this file keeps a Broadcaster interface so the
-// runtime + tools don't have to know whether a live transport exists.
+// livekit broadcaster — sends agent state over the room data channel.
+// uses RoomServiceClient.sendData which broadcasts server-side without
+// spinning up a real participant. one helper per outbound message kind.
 //
-// behavior:
-//   • LogBroadcaster (default) → console.log each broadcast for visibility
-//     during demo runs. notion db writes are still the canonical record;
-//     this is just for the dev terminal trail.
-//   • NullBroadcaster → silent no-op. used if you want zero log noise.
-//
-// the runtime calls broadcastState/broadcastSpeak from inside tools, so even
-// without a transport those calls succeed (and the actual state lands in
-// notion via the tool's notion write).
+// livekit is OPTIONAL. fromEnv() returns NullBroadcaster (no-op) if creds
+// aren't set, so agents still work for notion-only demos.
 
-import type { AgentState, Broadcast, Mood, Position, Species } from "@mimi/types";
+import { AccessToken, DataPacket_Kind, RoomServiceClient } from "livekit-server-sdk";
 
+import {
+  ENV,
+  SPECIES_DESK,
+  type AgentState,
+  type Broadcast,
+  type Mood,
+  type Position,
+  type Species,
+} from "@mimi/types";
+
+// the public contract any broadcaster implementation satisfies. runtime depends
+// on this, not the concrete class — so swapping in a null impl is type-safe.
 export interface Broadcaster {
   start(): Promise<void>;
   broadcast(msg: Broadcast): Promise<void>;
@@ -24,62 +27,147 @@ export interface Broadcaster {
   disconnect(): Promise<void>;
 }
 
-interface CtorOpts {
-  identity: string;
-  species: Species;
-  name: string;
-}
-
-// silent — for tests or background workers.
+// no-op broadcaster used when livekit env isn't configured. logs the first
+// call so the operator knows livekit is faded (not broken).
 export class NullBroadcaster implements Broadcaster {
-  async start(): Promise<void> {}
-  async broadcast(): Promise<void> {}
+  private warned = false;
+  private warn(kind: string): void {
+    if (this.warned) return;
+    this.warned = true;
+    console.warn(`[broadcaster] livekit faded — ${kind} broadcasts will no-op. set LIVEKIT_URL/API_KEY/API_SECRET to enable 3D presence.`);
+  }
+  async start(): Promise<void> { this.warn("start"); }
+  async broadcast(): Promise<void> { /* silent — would spam */ }
   async broadcastState(): Promise<void> {}
   async broadcastSpeak(): Promise<void> {}
   async disconnect(): Promise<void> {}
 }
 
-// logs to stderr so the demo operator can watch each tool's broadcast land.
-export class LogBroadcaster implements Broadcaster {
-  private identity: string;
-  private species: Species;
-  private name: string;
-  constructor(opts: CtorOpts) {
+// factory — returns a real broadcaster if livekit env is configured, else null.
+export function broadcasterFromEnv(
+  env: Record<string, string | undefined>,
+  opts: { identity: string; species: Species; name: string },
+): Broadcaster {
+  const url = env[ENV.LIVEKIT_URL];
+  const apiKey = env[ENV.LIVEKIT_API_KEY];
+  const apiSecret = env[ENV.LIVEKIT_API_SECRET];
+  if (!url || !apiKey || !apiSecret) {
+    return new NullBroadcaster();
+  }
+  return LiveKitBroadcaster.fromEnv(env, opts);
+}
+
+export interface BroadcasterOptions {
+  url: string;
+  apiKey: string;
+  apiSecret: string;
+  room: string;
+  identity: string;
+  species: Species;
+  name: string;
+}
+
+export class LiveKitBroadcaster {
+  private readonly room: string;
+  private readonly identity: string;
+  private readonly species: Species;
+  private readonly name: string;
+  private readonly roomService: RoomServiceClient;
+  private readonly url: string;
+  private readonly apiKey: string;
+  private readonly apiSecret: string;
+
+  constructor(opts: BroadcasterOptions) {
+    this.url = opts.url;
+    this.apiKey = opts.apiKey;
+    this.apiSecret = opts.apiSecret;
+    this.room = opts.room;
     this.identity = opts.identity;
     this.species = opts.species;
     this.name = opts.name;
+    // RoomServiceClient takes a host (the http(s) form of the livekit url).
+    const host = opts.url.replace(/^ws/, "http");
+    this.roomService = new RoomServiceClient(host, opts.apiKey, opts.apiSecret);
   }
+
+  static fromEnv(env: Record<string, string | undefined>, opts: {
+    identity: string;
+    species: Species;
+    name: string;
+  }): LiveKitBroadcaster {
+    const url = required(env, ENV.LIVEKIT_URL);
+    const apiKey = required(env, ENV.LIVEKIT_API_KEY);
+    const apiSecret = required(env, ENV.LIVEKIT_API_SECRET);
+    // default room name — single shared room is the v1 design.
+    const room = env[ENV.LIVEKIT_ROOM] ?? "mimi-house-main";
+    return new LiveKitBroadcaster({
+      url, apiKey, apiSecret, room,
+      identity: opts.identity, species: opts.species, name: opts.name,
+    });
+  }
+
+  // mints a participant token. agents do not actually join — the broadcaster
+  // publishes via server api. token is generated here in case downstream
+  // code wants to surface it (e.g. for debug).
+  async mintToken(): Promise<string> {
+    const at = new AccessToken(this.apiKey, this.apiSecret, {
+      identity: this.identity,
+      name: this.name,
+    });
+    at.addGrant({ roomJoin: true, room: this.room, canPublishData: true });
+    return at.toJwt();
+  }
+
+  // announce presence + initial pose. call once on startup.
+  // resilient — if livekit is unreachable / unauthed, log + continue. the agent
+  // can still do notion work without a 3D presence. better than crashing the
+  // whole process every time creds are wrong.
   async start(): Promise<void> {
-    process.stderr.write(`[broadcaster:${this.identity}] ${this.name} online (${this.species})\n`);
-  }
-  async broadcast(msg: Broadcast): Promise<void> {
-    const head = `[broadcaster:${this.identity}]`;
-    switch (msg.type) {
-      case "presence":
-        process.stderr.write(`${head} presence kind=${msg.kind}${msg.species ? ` species=${msg.species}` : ""}\n`);
-        return;
-      case "agent_state":
-        process.stderr.write(`${head} state=${msg.state}${msg.mood ? ` mood=${msg.mood}` : ""}${msg.pos ? ` pos=(${msg.pos.x},${msg.pos.z})` : ""}\n`);
-        return;
-      case "agent_speak":
-        process.stderr.write(`${head} speak: ${msg.text.slice(0, 80)}\n`);
-        return;
-      case "chat":
-      case "npc_request":
-      case "event_echo":
-        return; // not used by the runtime side
+    try {
+      await this.mintToken(); // validate creds early
+    } catch (err) {
+      console.warn(`[broadcaster] mintToken failed (livekit creds invalid?): ${(err as Error).message}`);
+    }
+    const home = SPECIES_DESK[this.species];
+    try {
+      await this.broadcast({
+        type: "presence",
+        identity: this.identity,
+        kind: "agent",
+        species: this.species,
+        name: this.name,
+        pos: { x: home[0], z: home[1] },
+      });
+    } catch (err) {
+      console.warn(`[broadcaster] initial presence broadcast failed: ${(err as Error).message}`);
+      console.warn(`[broadcaster] continuing without livekit — agent will still handle events + write to notion.`);
     }
   }
+
+  // broadcast a message. swallows errors and logs them — never crashes the
+  // calling agent loop. agents call this from every tool, so a transient
+  // livekit blip shouldn't kill an entire claude turn.
+  async broadcast(msg: Broadcast): Promise<void> {
+    try {
+      const data = new TextEncoder().encode(JSON.stringify(msg));
+      await this.roomService.sendData(this.room, data, DataPacket_Kind.RELIABLE, {});
+    } catch (err) {
+      console.warn(`[broadcaster] ${msg.type} broadcast failed: ${(err as Error).message}`);
+    }
+  }
+
   async broadcastState(state: AgentState, pos?: Position, mood?: Mood): Promise<void> {
-    await this.broadcast({
+    const msg: Broadcast = {
       type: "agent_state",
       identity: this.identity,
       species: this.species,
       state,
       ...(pos ? { pos } : {}),
       ...(mood ? { mood } : {}),
-    });
+    };
+    await this.broadcast(msg);
   }
+
   async broadcastSpeak(text: string): Promise<void> {
     await this.broadcast({
       type: "agent_speak",
@@ -89,15 +177,16 @@ export class LogBroadcaster implements Broadcaster {
       animalese: true,
     });
   }
-  async disconnect(): Promise<void> {}
+
+  // there is no socket to close — this is server-side rpc. provided for
+  // symmetry with future participant-mode implementations.
+  async disconnect(): Promise<void> {
+    return;
+  }
 }
 
-// factory — keeps the previous signature so main.ts doesn't change.
-// always returns LogBroadcaster in v1. swap to a real transport here later
-// (server-sent events, websocket, vercel pubsub, etc) without touching callers.
-export function broadcasterFromEnv(
-  _env: Record<string, string | undefined>,
-  opts: CtorOpts,
-): Broadcaster {
-  return new LogBroadcaster(opts);
+function required(env: Record<string, string | undefined>, key: string): string {
+  const v = env[key];
+  if (!v) throw new Error(`agent-runtime/broadcaster: missing env ${key}`);
+  return v;
 }
