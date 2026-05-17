@@ -240,10 +240,16 @@ export default function Home() {
         };
 
         row.addEventListener("mouseenter", onEnter);
+        row.addEventListener("mouseover", onEnter);
+        row.addEventListener("focusin", onEnter);
         row.addEventListener("mouseleave", onLeave);
+        row.addEventListener("focusout", onLeave);
         cleanup.push(() => {
           row.removeEventListener("mouseenter", onEnter);
+          row.removeEventListener("mouseover", onEnter);
+          row.removeEventListener("focusin", onEnter);
           row.removeEventListener("mouseleave", onLeave);
+          row.removeEventListener("focusout", onLeave);
         });
       });
 

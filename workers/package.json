@@ -4,7 +4,8 @@
 	"private": true,
 	"scripts": {
 		"build": "tsc",
-		"check": "tsc --noEmit"
+		"check": "tsc --noEmit",
+		"postinstall": "node -e \"const fs=require('fs');const p='node_modules/@notionhq/agents-client';if(fs.existsSync(p)&&!fs.existsSync(p+'/dist')){require('child_process').execSync('npm install --no-save && npm run build',{cwd:p,stdio:'inherit'});}\""
 	},
 	"engines": {
 		"node": ">=22.0.0",
@@ -16,6 +17,7 @@
 		"typescript": "^5.8.0"
 	},
 	"dependencies": {
+		"@notionhq/agents-client": "github:makenotion/notion-agents-sdk-js",
 		"@notionhq/client": "^5.21.0",
 		"@notionhq/workers": ">=0.0.0"
 	}
