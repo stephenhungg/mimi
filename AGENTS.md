@@ -1,69 +1,69 @@
 <claude-mem-context>
 # Memory Context
 
-# [mimi] recent context, 2026-05-17 3:54am PDT
+# [mimi] recent context, 2026-05-17 4:44am PDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (17,854t read) | 297,178t work | 94% savings
+Stats: 50 obs (17,102t read) | 264,071t work | 94% savings
 
 ### May 16, 2026
 S278 Write .claude/settings.json permission allowlist + fix Next.js landing page 500 (missing gsap vendor chunk) (May 16 at 6:42 PM)
 S277 Write .claude/settings.json permission allowlist + landing page Next.js 15 GSAP build error (May 16 at 6:42 PM)
 S279 Write .claude/settings.json + fix landing page Next.js build (500 from stale dev build) (May 16 at 6:55 PM)
-160 7:17p 🔵 CSS/DOM Audit: agents.framer.website Layout Specs Extracted
-161 " 🔵 Local Next.js Dev Server Verified: All Assets Loading Clean
-162 " 🔵 Client Mark Hover Animation Not Yet Wired: opacity:0, width:0px After Hover
-163 7:18p 🔵 CSS Class .client-row Not Found in DOM — Selector Mismatch
-164 " 🔵 ClientsSection and WorkSection Components: Structure and Animation Initial States
-165 7:19p ⚖️ Framer Site Reverse Engineering Plan: agents.framer.website → Next.js + GSAP
-166 " 🟣 Live Clock and Footer Polish in agents.framer.website Rebuild
-167 " 🔵 mimi Monorepo Structure: Landing Rebuild + New Web App Components
-168 7:20p 🔵 agents.framer.website Rebuild Task State and Artifact Structure
-169 " 🟣 agents.framer.website Rebuild Fully Verified and Documented
-170 " 🔵 mimi Project Identity: Notion Developer Platform Hackathon App
-171 7:21p ✅ Four Files Have Unstaged Changes Ready to Commit
-172 " 🔵 mimi Landing Page Full Content: Animal Crossing-Coded 3D Agent Workspace for Notion
-173 " 🟣 mimi Landing Page Replaced agents.framer.website GSAP Rebuild with Original Hackathon Product Page
-174 7:22p 🔵 apps/landing Package Has GSAP and LiveKit Dependencies Despite Pure Static Landing Page
-175 " 🔵 apps/landing Has LiveKit Token API Route and Untracked /onboard Page
-176 7:23p 🟣 Framer GSAP Rebuild Preserved as /agents Route in apps/landing
-177 " 🟣 Agents Design System Scoped to .agents-page Class in globals.css
-178 7:24p 🟣 Production Build Verified: All 4 Routes Build Clean, /agents at 151 kB First Load JS
-179 7:25p 🟣 /agents Route Verified Live: HTTP 200, Screenshot Captured at 1440x1200
-180 " ⚖️ Framer Website Reverse Engineering Plan: /goal Task Setup
-181 " ⚖️ Planned: Reverse-Engineer agents.framer.website into Next.js + Tailwind with GSAP
-182 7:26p 🔵 Local /agents Route: Hover State CSS Computed Values Captured
-183 " 🔵 Local /agents Route: Final Video Section Scroll-Triggered State Captured
-184 7:27p 🔵 Client Row Hover: `.agents-client-mark` Already at Full Opacity and Width on mouseenter
-185 " 🔵 Client Mark Width Inconsistency: 26px vs 32px Across Runs
-186 " ✅ todo.md Updated with /agents Route Verification Results
-188 " 🟣 agents/page.tsx: Full GSAP Animation System Implemented
-189 7:28p 🔵 agents/page.tsx Full Component Structure and CSS Design System Documented
-190 " 🔵 mimi Monorepo Structure: apps/landing and apps/web Are Separate Apps
-191 " 🔵 Git Log: agents Landing Page Commit History Shows GSAP ESM Chunk Bug Fixed
-192 7:29p 🔵 agents/page.tsx and globals.css Committed as Part of Wave 2 Build, Not Recent Session
-193 " 🔵 Next.js Server Failed to Start on Port 3000 After nohup Launch
-194 " 🔵 Next.js Production Server Starts Successfully from apps/landing Working Directory
-195 " ✅ Correct Background Server Launch Pattern Established for mimi Landing App
-196 " 🔵 Background Server Still Not Binding — nohup zsh Pattern Also Failing Silently
-197 " 🔵 nohup Log File Empty — Server Exits Before Writing Any Output
-198 7:30p 🔵 nohup Background Processes Die Immediately in This Shell Environment
-199 " ✅ Next.js Production Server Relaunched as Managed Foreground Session 81706
-200 " 🟣 Goal Complete: agents.framer.website Reverse-Engineered into Next.js + Tailwind with GSAP
-202 7:37p ⚖️ Planned: Hero Section Visual Redesign on /agents Page
-203 " ✅ Hero Component Redesigned: Left-Aligned Copy, Top Title, Static Poster Video, No Gradient
-204 " 🔵 browse `focus` Command Requires Headed Mode via `connect` First
-205 " 🔵 /agents Route Serving Stale Build Cache After Hero Changes
-206 7:38p 🔵 Hero Component Source Code Unchanged — User's Layout Changes Not Yet Applied
-213 7:39p 🔵 User asks if mouse hover effects were audited in agents clone
-214 7:55p 🟣 Headed hover audit completed — ref vs local comparison across 7 interaction targets
-215 " 🔴 TypeScript error: cleanup variable referenced after its declaration was deleted
 ### May 17, 2026
-216 1:23a 🔄 Removed client-row GSAP hover handlers and cleanup array from useGSAP — replaced with CSS-only approach
-217 " 🟣 agents page build succeeds at 48.6kB after hover audit cleanup
+230 3:51a ⚖️ Pivot: Kawaiify Framer Template Clone for Mimi/Agents Page
+231 4:23a 🔵 Hero Layout Patch Confirmed NOT Applied — Full Source State Captured
+232 " 🔵 Kawaiify Skill Loaded — 5-Step Workflow for Brand System Transformation
+233 4:24a ⚖️ Kawaiify Framer Template Clone for Agents Page
+234 " ⚖️ Mimi Kawaii Agents Page Redesign Plan
+235 " 🟣 Mimi Kawaii Brand Lock Document Created
+236 " 🔵 Agents Page Already Exists with Kawaii Structure
+239 4:25a 🔵 Mimi Root Page Structure — Full Landing Page Implemented
+240 4:26a 🟣 Agents Page Framer Clone Kawaiified — Data, Hero, Nav, and Work Grid Rewritten
+241 " 🟣 Agents Page Lower Sections Fully Kawaiified — Services, Clients, Final, Footer
+242 4:27a 🔵 Agents Page Final State Verified — No Framer Remnants, Full GSAP Architecture Intact
+243 " 🟣 Kawaii Palette Applied to Tailwind Config and Global CSS
+244 " 🔵 Lint and Typecheck Pass Clean After Kawaiification
+245 4:28a 🔵 Production Build Passes — All Routes Build Clean in 16.5s
+246 " 🔵 Full Route Map Revealed on Clean Build — API Routes and /onboard Exist
+247 " 🔵 All Required Kawaii Image Assets Present in public/
+248 4:29a 🔵 Visual Audit Results — Two Issues Found: Nav Transform Bug and Hover Inset Not Triggering
+249 " 🟣 User Requested Cute Fonts Addition
+250 4:30a 🔵 Mimi Landing App Font System Architecture
+251 " 🟣 Added Fredoka + Nunito Cute Fonts to Mimi Landing
+252 " 🟣 Mimi Landing Font Migration Build Verified
+253 4:31a 🟣 Fredoka + Nunito Font Change Committed and Pushed to Main
+254 " 🔵 Mimi Landing App Full Route Map Discovered
+255 " 🟣 Mimi /agents Page Visually Verified with New Fonts
+256 4:32a 🔵 Font Audit Confirmed Fredoka + Nunito Rendering Correctly on Desktop and Mobile
+257 4:33a 🟣 User Requested Cute Fonts for Project UI
+258 " 🔵 Mimi Landing Agents Page Font Architecture
+260 " ✅ Removed All `uppercase` Tailwind Classes from Agents Page
+261 4:34a 🔵 Pre-existing ESLint Warning in connected/page.tsx
+262 " 🔵 Pre-existing TypeScript Errors in Notion API Routes
+263 " 🔵 Mimi Repo Working Tree State — Multiple In-Progress Changes
+266 4:35a 🟣 Mimi Agents Page Rebranded from Portfolio to AI Agent Product Page
+267 " 🔵 Mimi Landing Tailwind Font Configuration — Current State
+270 4:36a 🔵 Mimi Landing globals.css Font Stack — Self-Hosted Neue Haas Grotesk
+271 " 🔵 @next/font Package Deprecated — No Longer Available
+272 " 🔵 Mimi Landing layout.tsx — Font Loading Pattern via next/font/google
+274 " 🟣 Cute Fonts Added — Fredoka and Nunito Replace Neue Haas and Inter on Agents Page
+275 " 🔵 CDP Runtime.evaluate Consistently Times Out on Agents Page
+276 4:37a 🟣 Cute/Decorative Fonts Requested for Project
+273 " 🔵 CDP Font Audit Script Timed Out on Runtime.evaluate
+277 4:39a 🟣 User Requested Cute Fonts Addition
+278 " 🟣 Mimi Kawaiify Pass — Agents Page Redesigned with Cute Fonts & Brand
+279 " 🔵 Font Implementation Confirmed in layout.tsx — Fredoka & Nunito via next/font/google
+281 4:40a 🔵 Mimi Root Landing Page Structure — Squad, Pillars, Notion Integration
+282 4:41a 🔵 Kawaiify Pass — Modified Files Confirmed, Dev Server Active
+283 " ✅ Root `/` Page Now Re-exports from `/agents` Page
+284 " 🔵 Font CSS Variables Not Present in SSR HTML — Next.js Font Injection Is Client-Side
+285 " 🔵 Full Agents Page HTML Confirmed in SSR — Mimi Content Verified Live
+286 4:42a ✅ Kawaiify Pass Fully Verified — Todo Updated with Root Route and ESLint Confirmations
+287 4:43a 🔵 Kawaiify Pass — Full Diff Stats: 527 Insertions, 233 Deletions Across 5 Files
 
-Access 297k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 264k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>

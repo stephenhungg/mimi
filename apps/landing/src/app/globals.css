@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&family=Press+Start+2P&display=swap");
 
 :root {
   --asphalt: #302F2C;
@@ -22,7 +22,7 @@ html, body {
   padding: 0;
   background: var(--paper);
   color: var(--asphalt);
-  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Inter", sans-serif;
+  font-family: Nunito, ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -94,13 +94,19 @@ img, video { display: block; max-width: 100%; }
 }
 
 .agents-page {
-  --agents-black: #080808;
-  --agents-white: #f0f0f0;
-  --agents-gray: #86868b;
-  --agents-veil: rgba(240, 240, 240, 0.05);
+  --agents-black: #f6eddd;
+  --agents-white: #302f2c;
+  --agents-gray: #876d5d;
+  --agents-cloud: #fffaf0;
+  --agents-blush: #f7c9d4;
+  --agents-sky: #b9dff4;
+  --agents-banana: #f3cf74;
+  --agents-leaf: #b8d89a;
+  --agents-clay: #d89b72;
+  --agents-veil: rgba(48, 47, 44, 0.08);
   background: var(--agents-black);
   color: var(--agents-white);
-  font-family: Inter, "Inter Placeholder", sans-serif;
+  font-family: Nunito, Inter, "Inter Placeholder", sans-serif;
 }
 
 .agents-page img,
@@ -117,7 +123,7 @@ img, video { display: block; max-width: 100%; }
   background-image: url("https://framerusercontent.com/images/rR6HYXBrMmX4cRpXfXUOvpvpB0.png");
   content: "";
   inset: -200%;
-  opacity: 0.05;
+  opacity: 0.04;
   pointer-events: none;
   position: fixed;
   width: 400%;
@@ -136,7 +142,7 @@ img, video { display: block; max-width: 100%; }
 
 .agents-motion-title {
   opacity: 1;
-  transform: translate3d(0, 61px, 0);
+  transform: translate3d(0, 63px, 0);
   will-change: transform;
 }
 
@@ -149,12 +155,38 @@ img, video { display: block; max-width: 100%; }
   will-change: transform;
 }
 
+.agents-hero-wash {
+  background:
+    linear-gradient(180deg, rgba(246, 237, 221, 0.06) 0%, rgba(246, 237, 221, 0.44) 78%),
+    radial-gradient(circle at 50% 46%, rgba(255, 250, 240, 0.2), rgba(246, 237, 221, 0.72));
+}
+
 .agents-work-inset {
+  background: var(--agents-cloud);
+  border: 3px solid var(--agents-white);
+  border-radius: 8px;
+  box-shadow: 8px 8px 0 rgba(48, 47, 44, 0.28);
   opacity: 0;
   pointer-events: none;
   transform: scale(0.96);
   visibility: hidden;
   will-change: transform, opacity;
+}
+
+.agents-work-card {
+  background: var(--agents-cloud);
+  border: 3px solid var(--agents-white);
+  border-radius: 8px;
+  box-shadow: 6px 6px 0 rgba(48, 47, 44, 0.28);
+}
+
+.agents-work-card > img {
+  background: var(--agents-cloud);
+}
+
+.agents-work-card > div:last-child {
+  background: linear-gradient(180deg, rgba(255, 250, 240, 0), rgba(255, 250, 240, 0.82));
+  text-shadow: 0 1px 0 rgba(255, 250, 240, 0.8);
 }
 
 .agents-work-card img,
@@ -172,15 +204,30 @@ img, video { display: block; max-width: 100%; }
 
 .agents-client-mark {
   width: 32px;
+  filter: drop-shadow(3px 3px 0 rgba(48, 47, 44, 0.18));
 }
 
 .agents-mix-difference {
-  mix-blend-mode: difference;
+  mix-blend-mode: normal;
+}
+
+.agents-service-preview {
+  background: var(--agents-cloud);
+  border: 3px solid var(--agents-white);
+  border-radius: 8px;
+  box-shadow: 6px 6px 0 rgba(48, 47, 44, 0.25);
+}
+
+.agents-final-video {
+  background: var(--agents-cloud);
+  border: 3px solid var(--agents-white);
+  border-radius: 8px;
+  box-shadow: 8px 8px 0 rgba(48, 47, 44, 0.24);
 }
 
 .agents-fit-text {
-  font-size: clamp(7rem, 46vw, 11.25rem);
-  letter-spacing: -0.06em;
+  font-size: clamp(6.25rem, 42vw, 11.25rem);
+  letter-spacing: 0;
   line-height: 0.8;
 }
 
@@ -192,6 +239,6 @@ img, video { display: block; max-width: 100%; }
 
 .agents-watermark {
   font-size: 320px;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
   line-height: 0.8;
 }

@@ -101,8 +101,57 @@ remaining fidelity notes:
 
 ## deeper motion fidelity pass
 
-- [ ] restore hover-only work-card inset media.
-- [ ] add gsap smooth scrolling with `ScrollSmoother`.
-- [ ] audit reference motion deeper through load, scroll, card hover, service activation, client hover, and footer.
-- [ ] tune local gsap against headed chrome samples.
-- [ ] rebuild, verify, and record evidence.
+- [x] restore hover-only work-card inset media.
+- [x] add gsap smooth scrolling with `ScrollSmoother`.
+- [x] audit reference motion deeper through load, scroll, card hover, service activation, client hover, and footer.
+- [x] tune local gsap against headed chrome samples.
+- [x] rebuild, verify, and record evidence.
+
+### deeper motion pass notes
+
+- work-card inset media is hover-only now: initial state is opacity `0`, hidden, scaled to `0.96`; hover animates to opacity `1`, scale `1`, cursor `none`, and starts the inset video; leaving pauses and resets the video.
+- `ScrollSmoother` is active on the agents page wrapper/content. headed wheel audit shows native `scrollY` jumps to `900`, while `.agents-smooth-content` eases from `0` to `-900` over ~1.2s.
+- hero title load now matches the headed framer timing closely at 1440x1200:
+  - reference y: `953.84`, `928.45`, `913.61`, `899.24`, `892.04`, `891.34`
+  - local y: `954`, `931.08`, `914.32`, `899.97`, `891.72`, `891`
+  - sampled at `0ms`, `81ms`, `162ms`, `301ms`, `613ms`, `1001ms` after load event.
+- had to stop a stale `next dev` listener and clean-rebuild `.next`; it was mixing dev css manifest paths with the production build and made browser measurements bogus until removed.
+- latest deeper artifacts:
+  - `tasks/artifacts/agents-deep-motion/deep-motion-audit.json`
+  - `tasks/artifacts/agents-deep-motion/local-final-load-audit.json`
+  - `tasks/artifacts/agents-deep-motion/local-final-interaction-audit.json`
+  - `tasks/artifacts/agents-deep-motion/local-final-load-301.png`
+  - `tasks/artifacts/agents-deep-motion/local-final-load-1001.png`
+  - `tasks/artifacts/agents-deep-motion/local-final-wheel.png`
+  - `tasks/artifacts/agents-deep-motion/local-final-hover.png`
+
+## mimi kawaiify pass
+
+- [x] audit the current `/` page and existing local assets as the kawaii brand source.
+- [x] add `apps/landing/public/kawaii/BRAND.md` with the mascot, palette, props, and typography lock.
+- [x] port `/agents` from the framer agency content to mimi content: hero, room cards, workflow rows, squad roster, final section, and footer.
+- [x] replace remote framer media with existing mimi assets from `public/`.
+- [x] add kawaii palette/sticker treatments while preserving the gsap smooth scroll, hero title motion, parallax, and hover-only card overlay mechanics.
+- [x] add cute fonts: `Fredoka` for display/hero/section text and `Nunito` for nav/body labels.
+- [x] remove uppercase transforms from `/agents` so the rounded lowercase typography comes through.
+- [x] make `/` render the kawaiified agents page by re-exporting `./agents/page`.
+- [x] verify `/agents` source returns `200` from the local dev server and contains the new mimi content.
+
+### kawaiify verification notes
+
+- `./node_modules/.bin/eslint src/app/agents/page.tsx --max-warnings=0` passed.
+- `./node_modules/.bin/eslint src/app/page.tsx src/app/agents/page.tsx --max-warnings=0` passed after routing `/` to the agents page.
+- `curl http://127.0.0.1:3000/agents` returned `200` and shows `mimi.`, `a 3d agent workspace...`, `notion sync`, and the local sprite/image paths.
+- `curl http://127.0.0.1:3000/` returned `200` and now shows the same agents page content.
+- full `bun run lint`, `bun run typecheck`, and production build are currently blocked by unrelated untracked landing files under `apps/landing/src/app/api/notion/`, `apps/landing/src/app/connected/`, and `apps/landing/src/lib/`.
+- local server is running with `next dev` so `/agents` reflects the current source despite those unrelated production-check blockers.
+
+## web modular avatar system
+
+- [ ] read `docs/AVATAR-SYSTEM.md` end to end.
+- [ ] download one base humanoid model to `apps/web/public/models/base/mimi_base_v1.glb`.
+- [ ] add `apps/web/src/lib/agents.ts` with the spec's 5 config rows.
+- [ ] add `apps/web/src/components/AgentMesh.tsx` for cloned, tinted, animated agent instances.
+- [ ] replace `AgentBillboard` placeholders in `apps/web/src/scenes/Room.tsx` with `AgentMesh`.
+- [ ] run `tsc`/`vite build`, fix failures, and record evidence.
+- [ ] commit and push the requested files.

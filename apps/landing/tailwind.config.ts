@@ -6,15 +6,15 @@ const config: Config = {
     extend: {
       colors: {
         agents: {
-          black: "#080808",
-          white: "#f0f0f0",
-          gray: "#86868b",
-          veil: "rgba(240, 240, 240, 0.05)"
+          black: "#f6eddd",
+          white: "#302f2c",
+          gray: "#876d5d",
+          veil: "rgba(48, 47, 44, 0.08)"
         }
       },
       fontFamily: {
-        display: ["Inter Display", "Inter Display Placeholder", "sans-serif"],
-        inter: ["Inter", "Inter Placeholder", "sans-serif"]
+        display: ["Fredoka", "Inter Display", "Inter Display Placeholder", "sans-serif"],
+        inter: ["Nunito", "Inter", "Inter Placeholder", "sans-serif"]
       }
     }
   },

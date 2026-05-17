@@ -17,7 +17,12 @@
 import type { ExternalEvent, Species } from "../packages/types/src/index.js";
 
 const AGENT_BASE = process.env.AGENT_BASE_URL ?? "http://localhost:8081";
-const EVENTS_URL = process.env.MIMI_EVENTS_URL; // optional — if set, goes through mimi-events
+// optional — if set AND not a placeholder, goes through mimi-events worker.
+// otherwise we hit the agent's /event endpoint directly.
+const RAW_EVENTS = process.env.MIMI_EVENTS_URL;
+const EVENTS_URL = RAW_EVENTS && !RAW_EVENTS.includes("example.workers.dev")
+  ? RAW_EVENTS
+  : undefined;
 
 type Poke = {
   species: Species;
