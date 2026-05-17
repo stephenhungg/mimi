@@ -3,6 +3,7 @@ import { useGLTF } from "@react-three/drei";
 import { BRAND, SPECIES_DESK } from "@mimi/types";
 import type { Species } from "@mimi/types";
 import { AgentMesh } from "../components/AgentMesh";
+import { StateAura } from "../components/StateAura";
 import { PlayerController } from "../components/PlayerController";
 import { V1_AGENTS } from "../lib/agents";
 import { trainerCardStore } from "../lib/room-context";
@@ -63,14 +64,20 @@ export function Room({ localIdentity: _localIdentity }: RoomProps) {
 
       <primitive object={scene} />
 
-      {/* config-driven agent meshes. click opens the trainer card via the shared store. */}
+      {/* config-driven agent meshes + state aura. aura makes state changes
+       *  visually readable even before the blender pipeline produces
+       *  distinct per-state animation clips (mixamo Idle covers walk/type/
+       *  wave/sleeping as a fallback). working = green, walking = blue,
+       *  talking = yellow, down = red, idle = no aura. */}
       {AGENT_LAYOUT.map(({ species, identity, position }) => (
-        <AgentMesh
-          key={species}
-          cfg={V1_AGENTS[species]}
-          position={position}
-          onClick={() => trainerCardStore.open({ species, identity })}
-        />
+        <group key={species}>
+          <AgentMesh
+            cfg={V1_AGENTS[species]}
+            position={position}
+            onClick={() => trainerCardStore.open({ species, identity })}
+          />
+          <StateAura species={species} position={position} />
+        </group>
       ))}
 
       <PlayerController />

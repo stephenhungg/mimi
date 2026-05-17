@@ -628,9 +628,10 @@ video {
 
 .agents-horizontal-pin {
   display: flex;
-  min-height: min(760px, calc(100vh - 112px));
-  align-items: center;
+  min-height: min(820px, 100vh);
+  align-items: flex-start;
   margin-inline: calc(50% - 50vw);
+  padding-top: 112px;
 }
 
 .agents-horizontal-track {
@@ -930,6 +931,7 @@ footer a:focus-visible {
     min-height: auto;
     margin-inline: 0;
     overflow: visible;
+    padding-top: 0;
   }
 
   .agents-horizontal-track {
