@@ -39,11 +39,11 @@ export async function GET(req: NextRequest) {
   if (!userId) {
     // unauthed: return empty so the poll loop doesn't crash. apps/web shows
     // local placeholders in that case.
-    return NextResponse.json({ agents: [], reason: "no_session" });
+    return json(req, { agents: [], reason: "no_session" });
   }
   const conn = await getConnection(userId);
   if (!conn?.dbs?.events) {
-    return NextResponse.json({ agents: [], reason: "not_provisioned" });
+    return json(req, { agents: [], reason: "not_provisioned" });
   }
 
   const notion = new NotionClient({ auth: conn.accessToken });
@@ -132,10 +132,14 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ agents: Array.from(seen.values()) });
+    return json(req, { agents: Array.from(seen.values()) });
   } catch (e) {
-    return NextResponse.json({ agents: [], error: (e as Error).message }, { status: 500 });
+    return json(req, { agents: [], error: (e as Error).message }, { status: 500 });
   }
+}
+
+export function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: cors(req) });
 }
 
 function parseRawPayload(raw: string): { kind?: unknown; text?: unknown } | null {
@@ -146,4 +150,23 @@ function parseRawPayload(raw: string): { kind?: unknown; text?: unknown } | null
   } catch {
     return null;
   }
+}
+
+function json(req: NextRequest, body: unknown, init?: ResponseInit) {
+  const res = NextResponse.json(body, init);
+  for (const [key, value] of Object.entries(cors(req))) {
+    res.headers.set(key, value);
+  }
+  return res;
+}
+
+function cors(req: NextRequest): Record<string, string> {
+  const origin = req.headers.get("origin") ?? "*";
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Credentials": "true",
+    "Vary": "Origin",
+  };
 }

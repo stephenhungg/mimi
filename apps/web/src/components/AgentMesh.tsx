@@ -1,7 +1,8 @@
 import { useAnimations, useGLTF } from "@react-three/drei";
 import type { ThreeEvent } from "@react-three/fiber";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  AnimationClip,
   Box3,
   Color,
   Group,
@@ -11,6 +12,7 @@ import {
   Vector3,
   type Object3D,
 } from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { clone as cloneSkeleton } from "three/examples/jsm/utils/SkeletonUtils.js";
 import type { AgentAvatarConfig, AnimationId } from "../lib/agents";
 
@@ -24,21 +26,79 @@ const TARGET_HEIGHT = 1.0;
 const SCALE_WARN_MIN = 0.75;
 const SCALE_WARN_MAX = 1.4;
 
+const ANIMATIONS_URL = "/models/animations/mimi_animations.glb";
+
+// Logical animation id -> ordered candidate clip names. We walk the chain and
+// pick the first action that exists. Include capitalization variants so we
+// match Mixamo-style ("Idle"), lowercase ("idle"), and humanized
+// ("Sleeping Idle") clip names without forcing the pipeline to rename them.
 const ANIMATION_ALIASES: Record<AnimationId, string[]> = {
-  idle: ["idle", "tpose"],
-  walk: ["walk", "run"],
-  sit: ["sit", "idle"],
-  type: ["type", "typing", "work", "idle"],
-  wave: ["wave", "idle"],
-  think: ["think", "idle"],
-  celebrate: ["celebrate", "idle"],
-  confused: ["confused", "idle"],
-  sleeping: ["sleeping", "sleep", "idle"],
-  pointing: ["pointing", "point", "idle"],
+  idle: ["idle", "Idle", "tpose", "TPose"],
+  walk: ["walk", "Walk", "Walking", "run", "Run"],
+  sit: ["sit", "Sit", "Sitting", "idle", "Idle"],
+  type: ["type", "Type", "Typing", "typing", "work", "Work", "idle", "Idle"],
+  wave: ["wave", "Wave", "Waving", "idle", "Idle"],
+  think: ["think", "Think", "Thinking", "idle", "Idle"],
+  celebrate: [
+    "celebrate",
+    "Celebrate",
+    "Cheering",
+    "Cheer",
+    "idle",
+    "Idle",
+  ],
+  confused: ["confused", "Confused", "idle", "Idle"],
+  sleeping: [
+    "sleeping",
+    "Sleeping",
+    "Sleeping Idle",
+    "sleep",
+    "Sleep",
+    "idle",
+    "Idle",
+  ],
+  pointing: ["pointing", "Pointing", "point", "Point", "idle", "Idle"],
 };
 
+// One-shot async load of the animations GLB outside React's Suspense, so a
+// missing file (first run before the blender-mcp pipeline produces it)
+// degrades to "use base clips only" instead of crashing the whole tree.
+let animationsPromise: Promise<AnimationClip[]> | null = null;
+function loadExtraAnimations(): Promise<AnimationClip[]> {
+  if (animationsPromise) return animationsPromise;
+  animationsPromise = new Promise((resolve) => {
+    const loader = new GLTFLoader();
+    loader.load(
+      ANIMATIONS_URL,
+      (gltf) => resolve(gltf.animations ?? []),
+      undefined,
+      (err) => {
+        console.warn(
+          `[AgentMesh] animations GLB missing at ${ANIMATIONS_URL} — falling back to base clips only.`,
+          err,
+        );
+        resolve([]);
+      },
+    );
+  });
+  return animationsPromise;
+}
+
 export function AgentMesh({ cfg, position, onClick }: AgentMeshProps) {
-  const { scene, animations } = useGLTF(`/models/base/${cfg.base}.glb`);
+  const { scene, animations: baseAnimations } = useGLTF(
+    `/models/base/${cfg.base}.glb`,
+  );
+
+  const [extraAnimations, setExtraAnimations] = useState<AnimationClip[]>([]);
+  useEffect(() => {
+    let alive = true;
+    loadExtraAnimations().then((clips) => {
+      if (alive) setExtraAnimations(clips);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const avatar = useMemo(() => {
     const next = cloneSkeleton(scene) as Group;
@@ -47,7 +107,12 @@ export function AgentMesh({ cfg, position, onClick }: AgentMeshProps) {
     return next;
   }, [cfg, scene]);
 
-  const { actions, names } = useAnimations(animations, avatar);
+  const mergedAnimations = useMemo(
+    () => [...baseAnimations, ...extraAnimations],
+    [baseAnimations, extraAnimations],
+  );
+
+  const { actions, names } = useAnimations(mergedAnimations, avatar);
   const clipName = useMemo(
     () => resolveClipName(cfg.default_animation, names),
     [cfg.default_animation, names],
@@ -155,6 +220,8 @@ function normalizeScale(root: Object3D, species: string) {
 }
 
 function resolveClipName(defaultAnimation: AnimationId, names: string[]) {
+  if (names.length === 0) return null;
+
   const normalized = new Map(names.map((name) => [normalizeName(name), name]));
 
   const exact = normalized.get(normalizeName(defaultAnimation));
@@ -165,7 +232,10 @@ function resolveClipName(defaultAnimation: AnimationId, names: string[]) {
     if (match) return match;
   }
 
-  return names[0] ?? null;
+  console.warn(
+    `[AgentMesh] could not resolve clip for "${defaultAnimation}". Available: ${names.join(", ")}. Falling back to "${names[0]}".`,
+  );
+  return names[0];
 }
 
 function normalizeName(value: string) {
@@ -173,3 +243,4 @@ function normalizeName(value: string) {
 }
 
 useGLTF.preload("/models/base/mimi_base_v1.glb");
+useGLTF.preload(ANIMATIONS_URL);

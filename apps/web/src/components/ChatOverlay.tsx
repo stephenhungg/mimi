@@ -139,8 +139,6 @@ export function ChatOverlay({ identity, name }: { identity: string; name: string
       echo.inFlight = false;
       setRouting({ pending: false, reasoning: body.reasoning, responders, round });
       if (echo.buffer.length > 0) scheduleEchoTick();
-      // agents will reply via the poll loop; reset routing badge after 6s.
-      setTimeout(() => setRouting({ pending: false }), 6000);
     } catch (e) {
       echoRef.current = null;
       setRouting({ pending: false, error: (e as Error).message });
