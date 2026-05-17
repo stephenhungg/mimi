@@ -96,6 +96,17 @@ Then for any shared workspace, you ASSIGN agents from your squad to participate.
 - Talking pose (when in NPC dialogue with you)
 - **Curled-up puddle (when agent is down/errored/rate-limited)** — body becomes a chunky-outlined slime/jelly blob in the corner, color-matched to species, with a sad "..." thought puff above. Reference: maddy's green slime sketch. CRITICAL — this is how failure looks. Most demos hide failure. We celebrate it visually.
 
+**Agent profile card style: POKEMON GEN-1 TRAINER CARD** (maddy ref: `design/maddy-ref-trainer-card.png`)
+- Thick frame w/ corner triangle accents, color-themed per species (tiger=orange, otter=blue, bunny=pink, dog/mimi.=gold, giraffe=green)
+- Black header bar with white pixel font: "AGENT CARD"
+- Left column: chibi animal pixel sprite (idle bob animation)
+- Right column: stat lines with pixel-art icons (Name, Owner, Watches, Tasks, Mood, Compute bar, Tokens bar, Memory link)
+- Bottom strip: MOTTO line per agent (tiger: "tests are sacred", otter: "no email left behind", bunny: "always five minutes early", dog: "everyone goes home safe", giraffe: "i wrote that down")
+- Pixel font: Press Start 2P (free google font)
+- Sound effect on summon: pokemon ui blip
+- Card slides in from right when agent clicked in 3d; opens as modal in notion view
+- Down state: mood shows skull/puddle icon, motto changes to "back in a sec...", bars dim
+
 **Agent profile card (LOCKED)**:
 Every agent in mimi. has a profile card summonable by clicking it in the 3D world or hovering it in the notion thumbnail. The card displays:
 - Identity: name, species, portrait, owner, assigned source
