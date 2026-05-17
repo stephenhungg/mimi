@@ -47,14 +47,19 @@ bun run dev:web
 # opens http://localhost:5173
 ```
 
-terminal 3 — agents (parallel):
+terminal 3 — agents (parallel, each on its own port):
 ```bash
-AGENT_PORT=8081 bun run dev:tiger
-# new tab — different port per agent
+AGENT_PORT=8081 bun run dev:tiger    # tiger gets the default port — apps/web hits :8081 first
 AGENT_PORT=8082 bun run dev:otter
 AGENT_PORT=8083 bun run dev:bunny
 AGENT_PORT=8084 bun run dev:dog
 ```
+
+each runtime accepts both `/dialogue` AND `/${species}/dialogue` (since the web
+client posts to the species-prefixed path). for a router-less single-host demo
+you can either: (a) point VITE_AGENT_BASE_URL at one shared reverse proxy that
+fans out by species path, OR (b) accept that only one species is reachable per
+VITE_AGENT_BASE_URL (set it to the species you'll dialogue with on stage).
 
 terminal 4 — utility (left open for the killshot):
 ```bash

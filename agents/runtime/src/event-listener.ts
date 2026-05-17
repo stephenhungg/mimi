@@ -46,17 +46,31 @@ export interface ListenerHandle {
 declare const Bun: any;
 
 export function startListener(opts: ListenerOptions): ListenerHandle {
-  const port = opts.port ?? Number(process.env.AGENT_PORT ?? 0);
+  // default to 8081 so apps/web (which assumes VITE_AGENT_BASE_URL=localhost:8081)
+  // can reach a single-agent dev run without extra env. set AGENT_PORT explicitly
+  // when running multiple agents on the same host (e.g. 8081 tiger, 8082 otter).
+  const port = opts.port ?? Number(process.env.AGENT_PORT ?? 8081);
+
+  // accept BOTH /dialogue and /${species}/dialogue (same for /event + /health).
+  // the web client posts to /${species}/dialogue so a future reverse proxy can
+  // route by species; a single-agent runtime just strips the prefix.
+  const speciesPrefix = `/${opts.runtime.species}`;
+  const stripSpecies = (path: string): string =>
+    path === speciesPrefix || path.startsWith(`${speciesPrefix}/`)
+      ? path.slice(speciesPrefix.length) || "/"
+      : path;
+
   const server = Bun.serve({
     port,
     fetch: async (req: Request): Promise<Response> => {
       const url = new URL(req.url);
+      const path = stripSpecies(url.pathname);
 
-      if (req.method === "GET" && url.pathname === "/health") {
+      if (req.method === "GET" && path === "/health") {
         return json(opts.runtime.health());
       }
 
-      if (req.method === "POST" && url.pathname === "/event") {
+      if (req.method === "POST" && path === "/event") {
         const body = await safeJson(req);
         const parsed = EVENT_SCHEMA.safeParse(body);
         if (!parsed.success) {
@@ -70,7 +84,7 @@ export function startListener(opts: ListenerOptions): ListenerHandle {
         return json({ ok: true, accepted: event.id });
       }
 
-      if (req.method === "POST" && url.pathname === "/dialogue") {
+      if (req.method === "POST" && path === "/dialogue") {
         const body = await safeJson(req);
         const parsed = DIALOGUE_SCHEMA.safeParse(body);
         if (!parsed.success) {

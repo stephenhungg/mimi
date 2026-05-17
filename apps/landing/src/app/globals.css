@@ -60,3 +60,116 @@ img, video { display: block; max-width: 100%; }
 }
 
 ::selection { background: var(--asphalt); color: var(--paper); }
+
+@font-face {
+  font-family: "Inter";
+  src: url("https://framerusercontent.com/assets/GrgcKwrN6d3Uz8EwcLHZxwEfC4.woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("https://framerusercontent.com/assets/yDtI2UI8XcEg1W2je9XPN3Noo.woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter Display";
+  src: url("https://framerusercontent.com/assets/PfdOpgzFf7N2Uye9JX7xRKYTgSc.woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter Display";
+  src: url("https://framerusercontent.com/assets/qITWJ2WdG0wrgQPDb8lvnYnTXDg.woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+.agents-page {
+  --agents-black: #080808;
+  --agents-white: #f0f0f0;
+  --agents-gray: #86868b;
+  --agents-veil: rgba(240, 240, 240, 0.05);
+  background: var(--agents-black);
+  color: var(--agents-white);
+  font-family: Inter, "Inter Placeholder", sans-serif;
+}
+
+.agents-page img,
+.agents-page video {
+  max-width: none;
+}
+
+.agents-page::selection {
+  background: var(--agents-white);
+  color: var(--agents-black);
+}
+
+.agents-noise::after {
+  background-image: url("https://framerusercontent.com/images/rR6HYXBrMmX4cRpXfXUOvpvpB0.png");
+  content: "";
+  inset: -200%;
+  opacity: 0.05;
+  pointer-events: none;
+  position: fixed;
+  width: 400%;
+  height: 400%;
+  z-index: 50;
+}
+
+.agents-motion-nav,
+.agents-motion-copy,
+.agents-motion-title {
+  opacity: 0.001;
+  will-change: transform, opacity;
+}
+
+.agents-motion-nav {
+  transform: translate3d(-50%, -48px, 0);
+}
+
+.agents-motion-title {
+  transform: translate3d(0, 128px, 0);
+}
+
+.agents-reveal-up {
+  will-change: transform, opacity;
+}
+
+.agents-work-card img,
+.agents-work-card video,
+.agents-service-preview img,
+.agents-client-mark,
+.agents-final-video {
+  will-change: transform;
+}
+
+.agents-mix-difference {
+  mix-blend-mode: difference;
+}
+
+.agents-fit-text {
+  font-size: clamp(7rem, 46vw, 11.25rem);
+  letter-spacing: -0.06em;
+  line-height: 0.8;
+}
+
+@media (min-width: 810px) {
+  .agents-fit-text {
+    font-size: clamp(11rem, 26.5vw, 24.5rem);
+  }
+}
+
+.agents-watermark {
+  font-size: 320px;
+  letter-spacing: -0.04em;
+  line-height: 0.8;
+}

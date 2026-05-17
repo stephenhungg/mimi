@@ -13,7 +13,8 @@
 //   AGENT_BASE_URL=http://localhost:8081  (agents/runtime default)
 //   MIMI_EVENTS_URL=https://...workers... (or AGENT_BASE_URL fallback)
 
-import type { ExternalEvent, Species } from "@mimi/types";
+// scripts run from repo root with bun — workspace aliases aren't resolved here.
+import type { ExternalEvent, Species } from "../packages/types/src/index.js";
 
 const AGENT_BASE = process.env.AGENT_BASE_URL ?? "http://localhost:8081";
 const EVENTS_URL = process.env.MIMI_EVENTS_URL; // optional — if set, goes through mimi-events

@@ -3,7 +3,9 @@
 // writes results back to .env.local so other packages can find the ids.
 
 import { Client } from "@notionhq/client";
-import { NOTION_PROPS, ENV } from "@mimi/types";
+// scripts run from repo root with bun — workspace aliases aren't resolved here,
+// so import directly from the package source.
+import { NOTION_PROPS, ENV } from "../packages/types/src/index.js";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 

@@ -3,8 +3,10 @@
 //
 // usage: bun scripts/seed-demo.ts
 
-import { MimiNotion } from "@mimi/notion-client";
-import { SPECIES_MOTTO, type Species } from "@mimi/types";
+// scripts run from repo root with bun — workspace aliases aren't resolved here,
+// so import directly from the package source.
+import { MimiNotion } from "../packages/notion-client/src/index.js";
+import { SPECIES_MOTTO, type Species } from "../packages/types/src/index.js";
 
 const TEAM_HUMANS = [
   { identity: "stephen", name: "stephen" },
