@@ -1,16 +1,24 @@
 {
 	"compilerOptions": {
-		"target": "ES2020",
+		"target": "ES2022",
 		"module": "nodenext",
 		"outDir": "./dist",
-		"rootDir": "./src",
+		"rootDir": "./",
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true,
-		"moduleResolution": "nodenext"
+		"moduleResolution": "nodenext",
+		"lib": ["ES2022", "DOM"]
 	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules", "dist"]
+	"include": [
+		"mimi-events/**/*.ts",
+		"mimi-github-bridge/**/*.ts",
+		"mimi-overnight-pulse/**/*.ts",
+		"mimi-thumbnail-render/**/*.ts",
+		"mimi-mcp-server/**/*.ts",
+		"_shared/**/*.ts"
+	],
+	"exclude": ["node_modules", "dist", ".examples"]
 }

@@ -1,0 +1,80 @@
+/* global reset + brand frame. asphalt + paper — never pure b/w. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #302f2c;
+  color: #efede3;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  overflow: hidden;
+}
+
+canvas {
+  display: block;
+}
+
+/* hide cursor while pointer is locked into the canvas */
+body.pointer-locked {
+  cursor: none;
+}
+
+/* HUD overlay — corner wordmark + key hint pill */
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  color: #efede3;
+}
+
+.hud-wordmark {
+  position: absolute;
+  top: 18px;
+  left: 22px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: #efede3;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.hud-hint {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(48, 47, 44, 0.85);
+  color: #efede3;
+  border: 1px solid #efede3;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.hud-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  background: #efede3;
+  border-radius: 50%;
+  opacity: 0.7;
+}
