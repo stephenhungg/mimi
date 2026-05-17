@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Inter";
+  src: url("https://framerusercontent.com/assets/GrgcKwrN6d3Uz8EwcLHZxwEfC4.woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("https://framerusercontent.com/assets/yDtI2UI8XcEg1W2je9XPN3Noo.woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter Display";
+  src: url("https://framerusercontent.com/assets/PfdOpgzFf7N2Uye9JX7xRKYTgSc.woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter Display";
+  src: url("https://framerusercontent.com/assets/qITWJ2WdG0wrgQPDb8lvnYnTXDg.woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --agents-black: #080808;
+  --agents-white: #f0f0f0;
+  --agents-gray: #86868b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--agents-black);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background: var(--agents-black);
+  color: var(--agents-white);
+  font-family: Inter, "Inter Placeholder", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+video {
+  display: block;
+  max-width: none;
+}
+
+::selection {
+  background: var(--agents-white);
+  color: var(--agents-black);
+}
+
+.agents-noise::after {
+  background-image: url("https://framerusercontent.com/images/rR6HYXBrMmX4cRpXfXUOvpvpB0.png");
+  content: "";
+  inset: -200%;
+  opacity: 0.05;
+  pointer-events: none;
+  position: fixed;
+  width: 400%;
+  height: 400%;
+  z-index: 50;
+}
+
+.motion-nav,
+.motion-copy,
+.motion-title {
+  opacity: 0.001;
+  will-change: transform, opacity;
+}
+
+.motion-nav {
+  transform: translate3d(-50%, -48px, 0);
+}
+
+.motion-title {
+  transform: translate3d(0, 128px, 0);
+}
+
+.reveal-up {
+  opacity: 0;
+  transform: translate3d(0, 48px, 0);
+}
+
+.work-card img,
+.work-card video,
+.service-preview img {
+  will-change: transform;
+}
+
+.mix-difference {
+  mix-blend-mode: difference;
+}
+
+.agents-fit-text {
+  font-size: clamp(7rem, 46vw, 11.25rem);
+  letter-spacing: -0.06em;
+  line-height: 0.8;
+}
+
+.agents-watermark {
+  font-size: 320px;
+  letter-spacing: -0.04em;
+  line-height: 0.8;
+}
+
+@media (max-width: 809.98px) {
+  .agents-watermark {
+    font-size: 320px;
+  }
+}

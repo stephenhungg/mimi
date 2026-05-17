@@ -91,7 +91,47 @@ Then for any shared workspace, you ASSIGN agents from your squad to participate.
 
 **Mood expressions**: each agent has a mood state visible on its face. Reference: the cat sticker sheet from maddy's doc (sad, happy, surprised, sparkly-eyed, sleepy, etc).
 
-**Animations to nail**:
+**Avatar pipeline (LOCKED — 2.5D sprite billboards)**:
+
+Skip full 3D rigged characters. Each chibi is a **2D sprite rendered as a billboard in the 3D scene** (always faces camera). This is the animal-crossing-in-3D pattern — sprite billboards + 3D environment.
+
+Pipeline:
+1. **Sprites come from higgsfield** (already generated in `design/generated/`)
+2. **Each agent has 3 sprite states**: idle, working (keyboard slam), down (curled puddle)
+3. **R3F renders as `<Billboard>` + textured plane** — ~10 lines per agent
+4. **State transitions = sprite swap** + position lerp via livekit data channel
+
+```typescript
+// apps/web/src/components/AgentBillboard.tsx
+<Billboard follow position={[x, y, z]}>
+  <mesh>
+    <planeGeometry args={[1, 1.5]} />
+    <meshBasicMaterial map={sprites[agent.state]} transparent alphaTest={0.1} />
+  </mesh>
+</Billboard>
+```
+
+**Agent tool calls drive avatar state**:
+```typescript
+// agents/runtime/src/tools/avatar.ts
+walk_to(x, z)           → broadcast { position, state: 'walking' }
+type_at_keyboard(ms)    → broadcast { state: 'working' }, sleep(ms), broadcast { state: 'idle' }
+speak(text)             → broadcast { speak, animalese: true, subtitle: text }
+curl_up()               → broadcast { state: 'down', mood: 'down' }
+```
+
+Claude in the agent runtime calls these tools naturally; the R3F client receives broadcasts and updates sprite + position. No skeleton rigging, no animation library to retarget, no GLTF loading drama.
+
+**Why 2.5D over full 3D**:
+1. Ships in 30 min vs 6+ hours
+2. Matches our brand exactly — animal crossing sprite + 3D world is THE reference
+3. Uses sprites we already generated
+4. Demo video reads better (low-poly 3D chibi = looks cheap; 2D sprite in 3D = intentional aesthetic)
+5. Failure recovery: if r3f breaks, fall back to pure 2D top-down view of same sprites — no asset rework
+
+**Fallback path (NOT for hackathon — for v2 post-ship)**: Tripo AI image-to-3D + Mixamo animation library + standard humanoid retarget. Avoids Blender MCP entirely (current MCP can't do character rigging well — confirmed via May 2026 research).
+
+**Animations to nail (now sprite-swap states, not skeletal animations)**:
 - Idle bob (every chibi at rest)
 - Walking
 - Keyboard slam (bongo cat / laptop cat) when an agent is "working"
