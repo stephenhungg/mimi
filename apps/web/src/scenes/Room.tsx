@@ -9,7 +9,7 @@ import { playerPosStore, useMimiRoomContext, trainerCardStore } from "../lib/roo
 
 const PAPER = BRAND.paper;
 
-const MODEL_URL = "/models/rooms.glb";
+const MODEL_URL = "/models/scene.gltf";
 
 // 5 agents arranged on a circle of radius 2.5 at y=0. once the model's
 // node names + bounds are visible in the console (see traverse below),
