@@ -18,6 +18,9 @@ interface AgentBillboardProps {
   mood?: Mood;
   speaking?: string;
   onSpeakingDone?: () => void;
+  /** click handler — opens the trainer card. parent supplies it so the click
+   *  routes through the shared trainerCardStore (works across canvas/dom). */
+  onClick?: () => void;
 }
 
 // preload all sprite textures so state swaps are instant.
@@ -32,6 +35,7 @@ export function AgentBillboard({
   name,
   speaking,
   onSpeakingDone,
+  onClick,
 }: AgentBillboardProps) {
   const url = spriteUrl(species, state);
   // useTexture returns a single texture for a single string.
@@ -69,7 +73,22 @@ export function AgentBillboard({
     <group position={[position[0], position[1] + baseY, position[2]]}>
       <group ref={group}>
         <Billboard follow lockX={false} lockY={false} lockZ={false}>
-          <mesh>
+          <mesh
+            onClick={(e) => {
+              if (!onClick) return;
+              e.stopPropagation();
+              onClick();
+            }}
+            onPointerOver={(e) => {
+              if (!onClick) return;
+              e.stopPropagation();
+              document.body.style.cursor = "pointer";
+            }}
+            onPointerOut={() => {
+              if (!onClick) return;
+              document.body.style.cursor = "";
+            }}
+          >
             <planeGeometry args={[planeWidth, planeHeight]} />
             <meshBasicMaterial
               map={texture}

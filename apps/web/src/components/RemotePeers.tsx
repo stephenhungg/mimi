@@ -6,8 +6,10 @@ import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Group } from "three";
 import { Vector3 } from "three";
+import { animalese } from "@mimi/animalese";
+import { SPECIES_VOICE } from "@mimi/types";
 import type { ChatMessage, PeerState } from "../lib/livekit";
-import { useMimiRoomContext } from "../lib/room-context";
+import { useMimiRoomContext, trainerCardStore } from "../lib/room-context";
 import { AgentBillboard } from "./AgentBillboard";
 import { HumanBillboard } from "./HumanBillboard";
 
@@ -63,6 +65,9 @@ function PeerRender({ peer, chat }: PeerRenderProps) {
 
   // most recent agent_speak line for this peer, if it's an agent.
   const [speaking, setSpeaking] = useState<string | undefined>(undefined);
+  // track the ts of the last message we played so we don't re-trigger on every
+  // re-render. animalese fires once per new speak event.
+  const lastPlayedTs = useRef<number>(0);
   useEffect(() => {
     if (peer.kind !== "agent") return;
     // find latest agent_speak from this identity.
@@ -70,10 +75,17 @@ function PeerRender({ peer, chat }: PeerRenderProps) {
       const m = chat[i];
       if (m && m.kind === "agent_speak" && m.identity === peer.identity) {
         setSpeaking(m.text);
+        // fire animalese once per new line — voice cluster keyed to species.
+        if (peer.species && m.ts > lastPlayedTs.current) {
+          lastPlayedTs.current = m.ts;
+          const voice = SPECIES_VOICE[peer.species];
+          // fire-and-forget; needs a prior user gesture (page click) for autoplay.
+          void animalese().speak(m.text, { voice }).catch(() => {});
+        }
         return;
       }
     }
-  }, [chat, peer.identity, peer.kind]);
+  }, [chat, peer.identity, peer.kind, peer.species]);
 
   return (
     <group ref={group}>
@@ -86,6 +98,14 @@ function PeerRender({ peer, chat }: PeerRenderProps) {
           mood={peer.mood}
           speaking={speaking}
           onSpeakingDone={() => setSpeaking(undefined)}
+          onClick={() => {
+            if (!peer.species) return;
+            trainerCardStore.open({
+              species: peer.species,
+              identity: peer.identity,
+              mood: peer.mood,
+            });
+          }}
         />
       ) : (
         <HumanBillboard position={[0, 0, 0]} name={peer.name} />

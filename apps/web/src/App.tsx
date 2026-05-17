@@ -1,18 +1,21 @@
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useMemo } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { BRAND } from "@mimi/types";
 import { Room } from "./scenes/Room";
 import { loadOrCreateIdentity, useMimiRoom } from "./lib/livekit";
-import { MimiRoomProvider } from "./lib/room-context";
+import { MimiRoomProvider, trainerCardStore } from "./lib/room-context";
 import { TypingProvider } from "./lib/typing";
 import { ChatOverlay } from "./components/ChatOverlay";
 import { NPCDialogue } from "./components/NPCDialogue";
+import { TrainerCard, type TrainerCardData } from "./components/TrainerCard";
 
 // fullscreen 3D canvas + HUD overlay.
 // fog matches asphalt so the room edges blend into the wordmark frame.
 export function App() {
   const { identity, name } = useMemo(() => loadOrCreateIdentity(), []);
   const mimi = useMimiRoom(identity, name);
+  const [activeCard, setActiveCard] = useState<TrainerCardData | null>(null);
+  useEffect(() => trainerCardStore.subscribe(setActiveCard), []);
 
   return (
     <TypingProvider>
@@ -42,6 +45,7 @@ export function App() {
         </div>
         <ChatOverlay identity={identity} name={name} />
         <NPCDialogue identity={identity} />
+        <TrainerCard card={activeCard} onClose={() => trainerCardStore.close()} />
       </MimiRoomProvider>
     </TypingProvider>
   );

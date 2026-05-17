@@ -5,7 +5,7 @@ import type { Species } from "@mimi/types";
 import { AgentBillboard } from "../components/AgentBillboard";
 import { PlayerController } from "../components/PlayerController";
 import { RemotePeers } from "../components/RemotePeers";
-import { playerPosStore, useMimiRoomContext } from "../lib/room-context";
+import { playerPosStore, useMimiRoomContext, trainerCardStore } from "../lib/room-context";
 
 // brand-locked palette + a few warm accent tones used only for physical props
 // inside the room (plant green, monitor glow). chibi color lives on the sprites.
@@ -96,13 +96,15 @@ export function Room({ localIdentity }: RoomProps) {
       <BunnyCorner pos={SPECIES_DESK.bunny} />
       <GiraffeCorner pos={SPECIES_DESK.giraffe} />
 
-      {/* placeholder agents — only render when no live broadcast for that species. */}
+      {/* placeholder agents — only render when no live broadcast for that species.
+       *  click → open trainer card via the shared store (works across canvas/dom). */}
       {!liveAgentSpecies.has("tiger") ? (
         <AgentBillboard
           species="tiger"
           state="idle"
           name={AGENT_NAMES.tiger}
           position={[SPECIES_DESK.tiger[0] + 1.2, 0, SPECIES_DESK.tiger[1] + 1.2]}
+          onClick={() => trainerCardStore.open({ species: "tiger", identity: "tiger" })}
         />
       ) : null}
       {!liveAgentSpecies.has("otter") ? (
@@ -111,6 +113,7 @@ export function Room({ localIdentity }: RoomProps) {
           state="idle"
           name={AGENT_NAMES.otter}
           position={[SPECIES_DESK.otter[0] - 1.2, 0, SPECIES_DESK.otter[1] + 1.2]}
+          onClick={() => trainerCardStore.open({ species: "otter", identity: "otter" })}
         />
       ) : null}
       {!liveAgentSpecies.has("bunny") ? (
@@ -119,6 +122,7 @@ export function Room({ localIdentity }: RoomProps) {
           state="idle"
           name={AGENT_NAMES.bunny}
           position={[SPECIES_DESK.bunny[0] + 1.2, 0, SPECIES_DESK.bunny[1] - 1.2]}
+          onClick={() => trainerCardStore.open({ species: "bunny", identity: "bunny" })}
         />
       ) : null}
       {!liveAgentSpecies.has("giraffe") ? (
@@ -127,6 +131,7 @@ export function Room({ localIdentity }: RoomProps) {
           state="idle"
           name={AGENT_NAMES.giraffe}
           position={[SPECIES_DESK.giraffe[0] - 1.2, 0, SPECIES_DESK.giraffe[1] - 1.2]}
+          onClick={() => trainerCardStore.open({ species: "giraffe", identity: "giraffe" })}
         />
       ) : null}
       {!liveAgentSpecies.has("dog") ? (
@@ -135,6 +140,7 @@ export function Room({ localIdentity }: RoomProps) {
           state="idle"
           name={AGENT_NAMES.dog}
           position={[SPECIES_DESK.dog[0], 0, SPECIES_DESK.dog[1]]}
+          onClick={() => trainerCardStore.open({ species: "dog", identity: "mimi" })}
         />
       ) : null}
 

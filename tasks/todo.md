@@ -24,6 +24,12 @@
   - `tasks/artifacts/agents-reference/ref-inspect-desktop.txt`
   - `tasks/artifacts/agents-reference/ref-media-styles.json`
 - local evidence captured from `http://127.0.0.1:3000/`:
+  - current implementation lives at `/agents` to preserve the separate mimi homepage at `/`.
+  - `tasks/artifacts/agents-local/local-agents-route-desktop.png`
+  - `tasks/artifacts/agents-local/local-agents-route-mobile.png`
+  - `tasks/artifacts/agents-local/local-agents-route-cssdom.json`
+  - `tasks/artifacts/agents-local/local-agents-route-hover-work.png`
+  - `tasks/artifacts/agents-local/local-agents-route-final-video.png`
   - `tasks/artifacts/agents-local/local-desktop-final.png`
   - `tasks/artifacts/agents-local/local-mobile-final.png`
   - `tasks/artifacts/agents-local/local-desktop-final-cssdom.json`
@@ -41,8 +47,11 @@
   - `bun run lint`
   - `bun run typecheck`
   - `bun run build`
-  - `curl http://127.0.0.1:3000/` returned `200`.
-  - next static asset probe checked 10 `/_next/` refs with 0 failures.
+  - `curl http://127.0.0.1:3000/agents` returned `200`.
+  - next static asset probe for `/agents` checked 10 `/_next/` refs with 0 failures.
+  - headed browser interaction probe confirmed `.agents-work-inset` reaches opacity `1` on work-card hover.
+  - headed browser scroll probe confirmed `.agents-final-video` reaches opacity `1` when the final section enters view.
+  - client mark reveal handler confirmed `.agents-client-mark` reaches opacity `1` and width `32px`.
 
 remaining fidelity notes:
 - the hero video frame can differ between captures because the framer reference and local page both play remote video; static screenshots should be compared by layout and treatment, not a single exact frame.

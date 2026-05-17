@@ -56,10 +56,17 @@ AGENT_PORT=8084 bun run dev:dog
 ```
 
 each runtime accepts both `/dialogue` AND `/${species}/dialogue` (since the web
-client posts to the species-prefixed path). for a router-less single-host demo
-you can either: (a) point VITE_AGENT_BASE_URL at one shared reverse proxy that
-fans out by species path, OR (b) accept that only one species is reachable per
-VITE_AGENT_BASE_URL (set it to the species you'll dialogue with on stage).
+client posts to the species-prefixed path). for multi-agent demos use the
+agent router in apps/landing:
+
+```env
+# in .env.local:
+VITE_AGENT_BASE_URL=http://localhost:3000/api/agent
+```
+
+then the landing's `/api/agent/${species}/${action}` route fans out to the
+matching per-species port (tiger=8081, otter=8082, bunny=8083, dog=8084,
+giraffe=8085 by default — override with AGENT_TIGER_URL etc).
 
 terminal 4 — utility (left open for the killshot):
 ```bash

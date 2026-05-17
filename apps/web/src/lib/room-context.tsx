@@ -58,3 +58,33 @@ class PlayerPosStore {
 }
 
 export const playerPosStore = new PlayerPosStore();
+
+// active trainer card store — same pub/sub pattern so the in-Canvas billboard
+// click handler can open the DOM-rendered TrainerCard.
+
+import type { TrainerCardData } from "../components/TrainerCard";
+
+class TrainerCardStore {
+  private active: TrainerCardData | null = null;
+  private listeners = new Set<(c: TrainerCardData | null) => void>();
+  open(c: TrainerCardData): void {
+    this.active = c;
+    this.listeners.forEach((l) => l(c));
+  }
+  close(): void {
+    this.active = null;
+    this.listeners.forEach((l) => l(null));
+  }
+  get(): TrainerCardData | null {
+    return this.active;
+  }
+  subscribe(fn: (c: TrainerCardData | null) => void): () => void {
+    this.listeners.add(fn);
+    return () => {
+      this.listeners.delete(fn);
+    };
+  }
+}
+
+export const trainerCardStore = new TrainerCardStore();
+
