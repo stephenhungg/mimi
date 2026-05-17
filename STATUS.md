@@ -1,6 +1,6 @@
 # mimi. — build status
 
-Updated: 2026-05-16 17:55 PT, hackathon hour ~7 of 21.
+Updated: 2026-05-16 18:05 PT, hackathon hour ~7.5 of 21.
 
 ## Wave 0 — Foundation ✅ COMPLETE
 - [x] Repo scaffold (apps, agents, workers, packages, design, scripts, docs)
@@ -16,41 +16,57 @@ Updated: 2026-05-16 17:55 PT, hackathon hour ~7 of 21.
 - [x] PROJECT.md + RESEARCH.md + BRAND.md fully synced
 - [x] ntn cli installed, authed against workspace `b1cfbde2-...`, template worker deploy verified
 
-## Wave 1 — Core build (IN PROGRESS)
+## Wave 1 — Core build (IN PROGRESS — major shipping in parallel)
 
-### `workers/`
-- [ ] `mimi-events` — replace template, wire `notion-client`, ingest broadcast payloads → dbs
-- [ ] `mimi-overnight-pulse` — 30-min sync, agent heartbeat, morning brief drafter
-- [ ] `mimi-mcp-server` — expose mimi. as MCP per-room, tools: join/move/speak/pick/write/query_memory
-- [ ] `mimi-github-bridge` — github webhook → events db + agent broadcast
+### `workers/` — 5 workers now (added mimi-thumbnail-render)
+- [x] `mimi-events` — real worker w/ POST /event webhook, tools (appendEvent, routeToAgent, health)
+- [x] `mimi-github-bridge` — github webhook w/ HMAC verify, simulatePush tool
+- [x] `mimi-overnight-pulse` — 30-min pulse scheduler, triggerPulse tool
+- [x] `mimi-thumbnail-render` — SVG renderer for notion thumbnail (NEW worker added)
+- [x] `mimi-mcp-server` — MCP surface w/ list_residents, recent_events, summon_agent, read_agent_memory, append_event
+- [x] `_shared/src/mimi.ts` — inlined types until workspace/npm interop sorted
+- [ ] Deploy all 5 via ntn
+- [ ] Wire env vars (NOTION_TOKEN, NOTION_DB_*, GITHUB_WEBHOOK_SECRET, AGENT_BASE_URL)
 
 ### `agents/runtime/`
-- [ ] Bun process, claude sonnet 4.6 via anthropic SDK
-- [ ] Persona loader (`personas/<species>.json` — tiger, otter, bunny, giraffe, dog)
-- [ ] Livekit participant join + position broadcast
-- [ ] Tool definitions: `walk_to`, `speak`, `pick_up`, `write_notion`, `query_other_agent`
-- [ ] Subscribe to mimi-events webhooks for source-of-truth state
+- [x] `package.json`, `tsconfig.json`
+- [x] All 5 persona files (tiger, otter, bunny, giraffe, dog) — .ts config + .md system prompts
+- [x] `personas/index.ts` PersonaConfig type
+- [x] `src/main.ts` + `src/runtime.ts` (claude loop entry)
+- [ ] Wire anthropic SDK + tool definitions (walk_to, speak, pick_up, write_notion, query_other_agent)
+- [ ] Livekit-server-sdk participant join + position broadcast
+- [ ] Subscribe to mimi-events POST callbacks
 
 ### `apps/web/`
-- [ ] R3F scene: first-person camera, WASD walk, cozy office geometry (low-poly placeholder)
-- [ ] `AgentBillboard` component — sprite states (idle/working/down), livekit position lerp
-- [ ] Livekit room join, data channel sub, audio channel sub
+- [x] vite config, tsconfig, package.json
+- [x] R3F scene: first-person camera, fog matched to asphalt, lighting (Room.tsx)
+- [x] `AgentBillboard` component — sprite states wired
+- [x] `PlayerController` — WASD + pointer-lock mouse look
+- [x] `NameTag` + `SpeechBubble` components
+- [x] Sprite library wired (lib/sprites.ts)
+- [x] HUD overlay (wordmark, crosshair, hint text)
+- [ ] Livekit room join + data channel sub
 - [ ] In-room text chat overlay
 - [ ] Subtitle reveal binding with animalese
-- [ ] Profile card (pokemon trainer card UI, color-themed per species, motto strip)
-- [ ] Onboarding flow (8 vibe cards → persona vector → squad page)
+- [ ] Profile card (pokemon trainer card UI)
+- [ ] Onboarding flow
 
 ### `apps/landing/`
-- [ ] Hero (wordmark + landing-hero-asphalt + "meet mimi." CTA)
-- [ ] Agent roster section (5 cards w/ portrait + motto + watches)
-- [ ] What-is-mimi (3 columns: squad / shared workspace / notion-grounded)
+- [x] Next.js scaffold, tailwind config, tsconfig
+- [x] `/api/livekit-token` route
+- [x] First reverse-engineering pass from `agents.framer.website` template
+- [ ] Swap framer placeholder assets for asphalt+paper brand assets
+- [ ] Agent roster section
+- [ ] What-is-mimi columns
 - [ ] Demo embed
-- [ ] Vercel deploy w/ favicon
+- [ ] Vercel deploy
 
 ### Notion side
-- [ ] Run `provision-notion-dbs.ts` against workspace
+- [x] `scripts/provision-notion-dbs.ts` written
+- [x] `scripts/seed-demo.ts` written
+- [ ] Run provision against workspace `b1cfbde2-...`
 - [ ] Stage today's brief template page
-- [ ] Add github + (optionally) gmail webhook subscribers
+- [ ] Add github webhook subscriber
 
 ## Wave 2 — Demo polish
 - [ ] Pre-stage overnight agent activity (real github webhook firing from one of stephen's repos)
