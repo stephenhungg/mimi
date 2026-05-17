@@ -21,6 +21,7 @@
     "seed:demo": "bun scripts/seed-demo.ts"
   },
   "devDependencies": {
+    "@gltf-transform/core": "^4.3.0",
     "@notionhq/client": "^2.2.15",
     "concurrently": "^9.1.0",
     "typescript": "^5.9.3"

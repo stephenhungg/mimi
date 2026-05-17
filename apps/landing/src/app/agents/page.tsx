@@ -9,9 +9,8 @@ import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { SplitText } from "gsap/SplitText";
 import { CustomEase } from "gsap/CustomEase";
-import { Flip } from "gsap/Flip";
 
-gsap.registerPlugin(useGSAP, ScrollTrigger, ScrollSmoother, ScrollToPlugin, SplitText, CustomEase, Flip);
+gsap.registerPlugin(useGSAP, ScrollTrigger, ScrollSmoother, ScrollToPlugin, SplitText, CustomEase);
 
 const media = {
   hero: "/hero.png",
@@ -416,59 +415,67 @@ export default function AgentsPage() {
         cleanup.push(() => mediaMatch.revert());
 
         mediaMatch.add("(min-width: 768px)", () => {
-          const bentoGrid = root.current?.querySelector<HTMLElement>(".agents-bento-grid");
-          const bentoCards = bentoGrid
-            ? gsap.utils.toArray<HTMLElement>(".agents-work-card", bentoGrid)
-            : [];
-
-          if (bentoGrid && bentoCards.length) {
-            const state = Flip.getState(bentoCards);
-            bentoGrid.classList.add("is-final");
-
-            const flip = Flip.from(state, {
-              absolute: true,
-              scale: true,
-              simple: true,
-              paused: true,
-              ease: "power2.inOut",
-              stagger: 0.025
-            });
-
-            gsap.timeline({
-              scrollTrigger: {
-                trigger: bentoGrid,
-                start: "top 74%",
-                end: "bottom 36%",
-                scrub: 0.9,
-                invalidateOnRefresh: true
+          gsap.utils.toArray<HTMLElement>(".agents-bento-grid .agents-work-card").forEach((card, index) => {
+            const mediaEl = card.querySelector<HTMLElement>(".agents-work-base");
+            gsap.fromTo(
+              card,
+              {
+                y: index % 2 === 0 ? 22 : 46,
+                rotate: index % 2 === 0 ? -0.8 : 0.8
+              },
+              {
+                y: index % 2 === 0 ? -18 : -30,
+                rotate: 0,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: ".agents-bento-grid",
+                  start: "top bottom",
+                  end: "bottom top",
+                  scrub: 1,
+                  invalidateOnRefresh: true
+                }
               }
-            }).add(flip, 0);
-          }
+            );
+            if (mediaEl) {
+              gsap.fromTo(
+                mediaEl,
+                { yPercent: -4 },
+                {
+                  yPercent: 5,
+                  ease: "none",
+                  scrollTrigger: {
+                    trigger: card,
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: 1,
+                    invalidateOnRefresh: true
+                  }
+                }
+              );
+            }
+          });
 
           gsap.utils.toArray<HTMLElement>(".agents-horizontal-section").forEach((section) => {
+            const pin = section.querySelector<HTMLElement>(".agents-horizontal-pin");
             const track = section.querySelector<HTMLElement>(".agents-horizontal-track");
-            if (!track) return;
+            if (!pin || !track) return;
 
-            const distance = () => Math.max(0, track.scrollWidth - section.clientWidth + 48);
+            const distance = () => Math.max(0, track.scrollWidth - pin.clientWidth + 64);
 
             gsap.to(track, {
               x: () => -distance(),
               ease: "none",
               scrollTrigger: {
-                trigger: section,
-                start: "top top",
-                end: () => `+=${distance() + window.innerHeight * 0.72}`,
-                pin: true,
+                trigger: pin,
+                start: "top top+=112",
+                end: () => `+=${distance() + window.innerHeight * 0.38}`,
+                pin,
                 scrub: 1,
                 anticipatePin: 1,
                 invalidateOnRefresh: true
               }
             });
           });
-
-          return () => {
-            bentoGrid?.classList.remove("is-final");
-          };
         });
 
         const footerBounce = root.current?.querySelector<HTMLElement>(".agents-footer-bounce");
@@ -977,24 +984,26 @@ function PinnedSquad() {
         </p>
       </div>
 
-      <div className="agents-horizontal-track mt-10 flex w-max gap-4">
-        {cards.map((card, index) => (
-          <article
-            key={`${card.key}-${index}`}
-            tabIndex={0}
-            className="agents-squad-card agents-horizontal-card flex flex-col"
-            style={{ "--agent": card.accent, "--agent-soft": card.soft } as CuteStyle}
-          >
-            <div className="agents-squad-image">
-              <img src={card.image} alt="" />
-            </div>
-            <div className="mt-auto flex flex-col gap-2">
-              <p className="agents-squad-name">{card.title}</p>
-              <p className="font-inter text-[13px] font-extrabold text-agents-gray">{card.label}</p>
-              <p className="font-inter text-[15px] font-bold leading-[1.25]">{card.line}</p>
-            </div>
-          </article>
-        ))}
+      <div className="agents-horizontal-pin mt-10 overflow-hidden">
+        <div className="agents-horizontal-track flex w-max gap-4">
+          {cards.map((card, index) => (
+            <article
+              key={`${card.key}-${index}`}
+              tabIndex={0}
+              className="agents-squad-card agents-horizontal-card flex flex-col"
+              style={{ "--agent": card.accent, "--agent-soft": card.soft } as CuteStyle}
+            >
+              <div className="agents-squad-image">
+                <img src={card.image} alt="" />
+              </div>
+              <div className="mt-auto flex flex-col gap-2">
+                <p className="agents-squad-name">{card.title}</p>
+                <p className="font-inter text-[13px] font-extrabold text-agents-gray">{card.label}</p>
+                <p className="font-inter text-[15px] font-bold leading-[1.25]">{card.line}</p>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );

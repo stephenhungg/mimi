@@ -15,6 +15,20 @@ import {
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { clone as cloneSkeleton } from "three/examples/jsm/utils/SkeletonUtils.js";
 import type { AgentAvatarConfig, AnimationId } from "../lib/agents";
+import { agentStateStore } from "../lib/room-context";
+import type { AgentState } from "@mimi/types";
+
+// AgentState (from notion poll / runtime broadcasts) → AnimationId (what
+// AgentMesh resolves via ANIMATION_ALIASES). when an agent's `state` flips
+// in the store, the mesh fades to the new clip. before any state event
+// arrives we fall back to cfg.default_animation.
+const STATE_TO_ANIMATION: Record<AgentState, AnimationId> = {
+  idle: "idle",
+  walking: "walk",
+  working: "type",
+  talking: "wave",
+  down: "sleeping",
+};
 
 interface AgentMeshProps {
   cfg: AgentAvatarConfig;
@@ -113,9 +127,31 @@ export function AgentMesh({ cfg, position, onClick }: AgentMeshProps) {
   );
 
   const { actions, names } = useAnimations(mergedAnimations, avatar);
+
+  // subscribe to agentStateStore — when the notion poll loop reports a new
+  // state for this species, swap the played animation. before any event,
+  // stays on cfg.default_animation. agents that aren't in the store map
+  // (e.g. before first poll) get their static default.
+  const [liveAnim, setLiveAnim] = useState<AnimationId | null>(null);
+  useEffect(() => {
+    return agentStateStore.subscribe((snap) => {
+      // find any entry for this species (identity may be "mimi" for dog,
+      // species name otherwise — match on species, not identity).
+      let next: AgentState | null = null;
+      for (const e of snap.values()) {
+        if (e.species === cfg.species && e.state) {
+          next = e.state;
+          break;
+        }
+      }
+      setLiveAnim(next ? STATE_TO_ANIMATION[next] : null);
+    });
+  }, [cfg.species]);
+
+  const activeAnim: AnimationId = liveAnim ?? cfg.default_animation;
   const clipName = useMemo(
-    () => resolveClipName(cfg.default_animation, names),
-    [cfg.default_animation, names],
+    () => resolveClipName(activeAnim, names),
+    [activeAnim, names],
   );
 
   useEffect(() => {

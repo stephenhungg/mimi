@@ -50,6 +50,10 @@ format: **<topic>** — what to do / what not to do. **why:** the reason. **how 
 **why:** smooth scrolling and small reveal tweens can be technically correct but visually underwhelming; the product has to feel reverse-engineered and custom, not like static cards with a dependency installed.
 **how to apply:** for landing-page animation work, include at least one unmistakable scroll-driven sequence, one tactile hover interaction, one load choreography, and one verification artifact that proves the motion runs in-browser.
 
+**don’t let scroll animation own structural layout unless the layout has been proved at scroll extremes.** bento/flip motion is only acceptable if the normal document flow remains stable before, during, and after the scrub.
+**why:** the first card section overlapped after the flip-style grid pass, and the horizontal pin began before the card strip was framed. flashy gsap is useless if it blocks reading the cards.
+**how to apply:** animate transforms/inner media first. if animating grid placement, verify screenshots at start/mid/end and confirm following sections never collide.
+
 **boil-the-ocean works only with a north-star killshot.** when scope is "everything", choose one demo moment (here: 1:30-2:00 commit→tiger jolts→PR) and order tasks so that beat works first, then expand outward.
 **why:** infinite scope without a focal beat = no demo at submission time. focal beat means at any cut-off, we have something to show.
 **how to apply:** wave 0 (foundation) → wave 1 (visual + network + agent + worker spines) → wave 2 (the killshot integration) → wave 3+ (everything else around it).

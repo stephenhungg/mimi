@@ -159,10 +159,33 @@ remaining fidelity notes:
 
 - [x] inspect downloaded gsap codepen exports for portable patterns.
 - [x] generate and save a new higgsfield sticker-sheet asset for mimi.
-- [ ] port the useful codepen patterns into the next.js/tailwind agents home page.
-- [ ] add obvious scroll-driven gsap: pinned horizontal squad strip, scrubbed bento/flip motion, sticker-sheet parallax, and footer velocity bounce.
-- [ ] preserve hover-only work-card overlay behavior while making hover animation more tactile.
-- [ ] verify with targeted lint/typecheck plus headed browser screenshots/interactions.
+- [x] port the useful codepen patterns into the next.js/tailwind agents home page.
+- [x] add obvious scroll-driven gsap: pinned horizontal squad strip, scrubbed bento/flip motion, sticker-sheet parallax, and footer velocity bounce.
+- [x] preserve hover-only work-card overlay behavior while making hover animation more tactile.
+- [x] verify with targeted lint/typecheck plus headed browser screenshots/interactions.
+
+### gsap codepen port verification notes
+
+- adapted downloaded patterns from autosplit scrolltrigger, horizontal scrolling gallery, scrubbed bento flip, and footer velocity bounce without copying their assets.
+- added `Flip`, scroll-scrubbed section headline line reveals, pinned horizontal squad strip, bento grid flip, sticker-sheet parallax, and footer bounce.
+- added a higgsfield-generated sticker sheet at `apps/landing/public/kawaii/sticker-sheet.png`.
+- `./node_modules/.bin/eslint src/app/agents/page.tsx src/app/page.tsx --max-warnings=0` passed.
+- targeted `tsc` for `src/app/agents/page.tsx` and `src/app/page.tsx` passed.
+- `bun run build` passed after moving stale `.next` artifacts aside; remaining build warnings are pre-existing unrelated metadata/eslint-disable warnings in other landing routes.
+- production server is running at `http://127.0.0.1:3000/` via `next start`.
+- `curl -I http://127.0.0.1:3000/` returned `200`.
+- `curl -I http://127.0.0.1:3000/_next/static/chunks/104-1f5ac0f8e6eaf900.js` returned `200`.
+- headed chrome final audit had zero console/runtime errors and saved:
+  - `tasks/artifacts/agents-gsap-port/final-headed-audit.json`
+  - `tasks/artifacts/agents-gsap-port/final-headed-hero.png`
+  - `tasks/artifacts/agents-gsap-port/horizontal-scrub-headed-v3.png`
+
+## card overlap + horizontal pin repair
+
+- [ ] remove fragile flip grid geometry from the first cards section.
+- [ ] keep a stable bento layout with scroll scrub motion that cannot overlap cards.
+- [ ] delay horizontal pinning until the card strip is framed below the nav.
+- [ ] verify first cards and horizontal cards in headed chrome.
 
 ## web modular avatar system
 
