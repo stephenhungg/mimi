@@ -13,28 +13,32 @@ This is the visual ground truth. Every asset reuses these specs. No new mascots,
 
 The other agent species (tiger, otter, bunny, giraffe) are supporting cast — they appear in the workspace but the dog/retriever is the brand mark.
 
-## Palette (locked hexes)
+## Palette (locked hexes — MONOCHROME)
 
 ```
-paper:       #FBF7F0   (warm cream, page surface)
-cloud:       #FFFFFF   (pure white)
-soft:        #FDEEF0   (pale sakura)
-hairline:    #E8DCD0   (soft border)
-muted:       #8C7A6B   (readable dusty body text)
-ink:         #1F1916   (warm near-black, all outlines and body)
-accent-100:  #FDD8DD   (very pale sakura)
-accent-300:  #F8A8B3   (light pink)
-accent-500:  #ED7A8C   (primary sakura pink)
-accent-700:  #B84256   (deep accent / shadow)
-shadow:      #2A1F1B   (sticker offset shadow color)
+paper:       #FAFAFA   (off-white page surface, just a tick warmer than pure white)
+cloud:       #FFFFFF   (pure white, for cards / fills)
+soft:        #F2F2F2   (subtle gray surface, hover background)
+hairline:    #E5E5E5   (soft border line)
+muted:       #6B6B6B   (readable medium-gray body text)
+ink:         #0F0F0F   (deep black, all outlines and headings)
+accent-100:  #E5E5E5   (very pale gray)
+accent-300:  #9C9C9C   (mid gray)
+accent-500:  #0F0F0F   (primary "accent" — just black)
+accent-700:  #000000   (pure black for shadow offsets)
+shadow:      #0F0F0F   (sticker offset shadow color = black)
 ```
 
 Roles:
-- backgrounds → paper (warm cream), occasional cloud (pure white) for cards
-- borders / outlines on chibis → ink (thick 3-4px equivalent)
-- primary CTA → accent-500 pill with shadow offset of accent-700
+- backgrounds → paper (off-white)
+- cards / surfaces → cloud (pure white) with hairline border
+- borders / outlines on chibis → ink (thick 3-4px black)
+- primary CTA → black pill with white text and black shadow offset (chunky)
 - text body → muted; headings → ink
-- hover/active states → accent-300
+- hover/active states → soft (#F2F2F2) fill
+- accent color on chibis is INTERNAL ONLY — each species can have its own subtle internal color (the tiger's orange fur, the otter's blue tint) but the brand frame, wordmark, and ui are monochrome
+
+**Brand reads**: linear / vercel / arc browser — serious infrastructure with personality. Mimi. is not a cute toy. Mimi. is a real product made by people with taste.
 
 ## Line + Shadow Treatment
 
